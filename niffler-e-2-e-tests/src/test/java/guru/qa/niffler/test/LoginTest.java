@@ -12,11 +12,21 @@ public class LoginTest {
 
   private static final Config CFG = Config.getInstance();
 
+  private static final String username = "duck";
+  private static final String password = "12345";
+
   @Test
   void mainPageShouldBeDisplayedAfterSuccessLogin() {
     Selenide.open(CFG.frontUrl(), LoginPage.class)
-        .fillLoginPage("duck", "12345")
+        .fillLoginPage(username, password)
         .submit()
         .checkThatPageLoaded();
+  }
+
+  @Test
+  void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
+    Selenide.open(CFG.frontUrl(), LoginPage.class)
+            .fillLoginPage(username, username)
+            .checkErrorAfterSubmitWithBadCredentials();
   }
 }
