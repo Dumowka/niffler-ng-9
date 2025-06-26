@@ -40,4 +40,8 @@ public class MainPage {
   public UserProfilePage goToUserProfilePage() {
     return header.openMenu().clickOnProfileButton();
   }
+
+  public FriendsPage goToUserFriendsPage() {
+    return header.openMenu().clickOnFriendsButton();
+  }
 }
