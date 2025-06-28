@@ -4,6 +4,7 @@ import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.utils.RandomDataUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class RegistrationTest {
 
     @BeforeEach
     public void setup() {
-        username = RandomStringUtils.randomAlphanumeric(10);
+        username = RandomDataUtils.randomUsername();
         password = RandomStringUtils.randomAlphanumeric(10);
     }
 

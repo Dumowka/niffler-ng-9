@@ -2,6 +2,7 @@ package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Spending;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -21,31 +22,18 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    AnnotationSupport.findAnnotation(
-        context.getRequiredTestMethod(),
-        Spending.class
-    ).ifPresent(
-        anno -> {
-          SpendJson spendJson = new SpendJson(
-              null,
-              new Date(),
-              new CategoryJson(
-                  null,
-                  anno.category(),
-                  anno.username(),
-                  false
-              ),
-              anno.currency(),
-              anno.amount(),
-              anno.description(),
-              anno.username()
-          );
+      User userAnnotation = AnnotationSupport.findAnnotation(
+              context.getRequiredTestMethod(),
+              User.class
+      ).orElse(null);
+
+      if (userAnnotation != null && userAnnotation.spendings().length != 0) {
+          SpendJson spendJson = createSpendJson(userAnnotation, userAnnotation.spendings()[0]);
           context.getStore(NAMESPACE).put(
-              context.getUniqueId(),
-              spendApiClient.addSpend(spendJson)
+                  context.getUniqueId(),
+                  spendApiClient.addSpend(spendJson)
           );
-        }
-    );
+      }
   }
 
   @Override
@@ -56,5 +44,24 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
   @Override
   public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
     return extensionContext.getStore(NAMESPACE).get(extensionContext.getUniqueId(), SpendJson.class);
+  }
+
+  private SpendJson createSpendJson(User userAnnotation, Spending spending) {
+      CategoryJson categoryJson = new CategoryJson(
+              null,
+              spending.category(),
+              userAnnotation.username(),
+              false
+      );
+
+      return new SpendJson(
+              null,
+              new Date(),
+              categoryJson,
+              spending.currency(),
+              spending.amount(),
+              spending.description(),
+              userAnnotation.username()
+      );
   }
 }
