@@ -22,18 +22,18 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-      User userAnnotation = AnnotationSupport.findAnnotation(
+      AnnotationSupport.findAnnotation(
               context.getRequiredTestMethod(),
               User.class
-      ).orElse(null);
-
-      if (userAnnotation != null && userAnnotation.spendings().length != 0) {
-          SpendJson spendJson = createSpendJson(userAnnotation, userAnnotation.spendings()[0]);
-          context.getStore(NAMESPACE).put(
-                  context.getUniqueId(),
-                  spendApiClient.addSpend(spendJson)
-          );
-      }
+      ).ifPresent(userAnnotation -> {
+          for (Spending spending : userAnnotation.spendings()) {
+              context.getStore(NAMESPACE).put(
+                      context.getUniqueId(),
+                      spendApiClient.addSpend(createSpendJson(userAnnotation, spending))
+              );
+              break; // он здесь нужен из-за того, что мы пока обрабатываем только один spending
+          }
+      });
   }
 
   @Override

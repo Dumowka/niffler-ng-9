@@ -1,6 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.SpendApiClient;
+import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.utils.RandomDataUtils;
@@ -19,18 +20,18 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        User userAnnotation = AnnotationSupport.findAnnotation(
+        AnnotationSupport.findAnnotation(
                 context.getRequiredTestMethod(),
                 User.class
-        ).orElse(null);
-
-        if (userAnnotation != null && userAnnotation.categories().length != 0) {
-            CategoryJson createdCategory = createCategory(userAnnotation);
-            if (userAnnotation.categories()[0].archived()) {
-                createdCategory = archiveCategory(createdCategory);
+        ).ifPresent(userAnnotation -> {
+            for (Category category : userAnnotation.categories()) {
+                context.getStore(NAMESPACE).put(
+                        context.getUniqueId(),
+                        createCategory(userAnnotation, category.archived())
+                );
+                break; // он здесь нужен из-за того, что мы пока обрабатываем только одну категорию
             }
-            context.getStore(NAMESPACE).put(context.getUniqueId(), createdCategory);
-        }
+        });
     }
 
     @Override
@@ -58,14 +59,16 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
         return extensionContext.getStore(CategoryExtension.NAMESPACE).get(extensionContext.getUniqueId(), CategoryJson.class);
     }
 
-    private CategoryJson createCategory(User userAnnotation) {
+    private CategoryJson createCategory(User userAnnotation, boolean isArchived) {
         CategoryJson categoryJson = new CategoryJson(
                 null,
                 RandomDataUtils.randomCategoryName(),
                 userAnnotation.username(),
                 false
         );
-        return spendApiClient.addCategory(categoryJson);
+        CategoryJson createdCategory = spendApiClient.addCategory(categoryJson);
+
+        return isArchived ? archiveCategory(createdCategory) : createdCategory ;
     }
 
     private CategoryJson archiveCategory(CategoryJson category) {
