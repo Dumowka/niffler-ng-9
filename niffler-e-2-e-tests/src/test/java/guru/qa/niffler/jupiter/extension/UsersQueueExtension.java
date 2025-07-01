@@ -66,7 +66,7 @@ public class UsersQueueExtension implements
         Map<UserType, Queue<StaticUser>> users = new HashMap<>();
 
         Arrays.stream(context.getRequiredTestMethod().getParameters())
-                .filter(p -> AnnotationSupport.isAnnotated(p, UserType.class))
+                .filter(p -> AnnotationSupport.isAnnotated(p, UserType.class) && p.getType().isAssignableFrom(StaticUser.class))
                 .map(p -> p.getAnnotation(UserType.class))
                 .forEach(userType -> {
                     Optional<StaticUser> user = Optional.empty();
@@ -100,9 +100,11 @@ public class UsersQueueExtension implements
                 Map.class
         );
 
-        for (Map.Entry<UserType, Queue<StaticUser>> entry : users.entrySet()) {
-            for (StaticUser user : entry.getValue()) {
-                getQueueByUserType(entry.getKey()).add(user);
+        if (users != null) {
+            for (Map.Entry<UserType, Queue<StaticUser>> entry : users.entrySet()) {
+                for (StaticUser user : entry.getValue()) {
+                    getQueueByUserType(entry.getKey()).add(user);
+                }
             }
         }
     }

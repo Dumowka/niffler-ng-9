@@ -2,17 +2,16 @@ package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.jupiter.extension.BrowserExtension;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static guru.qa.niffler.model.ErrorMessages.PASSWORDS_SHOULD_BE_EQUAL;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class RegistrationTest {
 
     private static final Config CFG = Config.getInstance();
