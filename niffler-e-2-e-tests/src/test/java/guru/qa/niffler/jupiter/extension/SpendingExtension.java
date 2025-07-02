@@ -1,10 +1,10 @@
 package guru.qa.niffler.jupiter.extension;
 
+import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.service.SpendDbClient;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -20,7 +20,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
 
-  private final SpendDbClient spendDbClient = new SpendDbClient();
+  private final SpendApiClient spendApiClient = new SpendApiClient();
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
@@ -31,7 +31,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
           for (Spending spending : userAnnotation.spendings()) {
               context.getStore(NAMESPACE).put(
                       context.getUniqueId(),
-                      createSpend(userAnnotation, spending)
+                      spendApiClient.addSpend(createSpendJson(userAnnotation, spending))
               );
               break; // он здесь нужен из-за того, что мы пока обрабатываем только один spending
           }
@@ -48,14 +48,15 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
     return createdSpending();
   }
 
-  private SpendJson createSpend(User userAnnotation, Spending spending) {
+  private SpendJson createSpendJson(User userAnnotation, Spending spending) {
       CategoryJson categoryJson = new CategoryJson(
               null,
               spending.category(),
               userAnnotation.username(),
               false
       );
-      return spendDbClient.createSpend(new SpendJson(
+
+      return new SpendJson(
               null,
               new Date(),
               categoryJson,
@@ -63,7 +64,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
               spending.amount(),
               spending.description(),
               userAnnotation.username()
-      ));
+      );
   }
 
     public static SpendJson createdSpending() {
