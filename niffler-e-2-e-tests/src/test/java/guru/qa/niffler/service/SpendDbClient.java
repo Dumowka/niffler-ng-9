@@ -6,6 +6,7 @@ import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
 import guru.qa.niffler.data.dao.impl.SpendDaoJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 
 public class SpendDbClient {
@@ -22,5 +23,10 @@ public class SpendDbClient {
         return SpendJson.fromEntity(
                 spendDao.create(spendEntity)
         );
+    }
+
+    public CategoryJson createCategory(CategoryJson category) {
+        CategoryEntity categoryEntity = categoryDao.create(CategoryEntity.fromJson(category));
+        return CategoryJson.fromEntity(categoryEntity);
     }
 }

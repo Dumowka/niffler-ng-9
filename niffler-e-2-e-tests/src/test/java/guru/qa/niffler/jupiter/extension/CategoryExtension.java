@@ -4,6 +4,7 @@ import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -18,7 +19,9 @@ import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.conte
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
+
     private final SpendApiClient spendApiClient = new SpendApiClient();
+    private final SpendDbClient spendDbClient = new SpendDbClient();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -74,7 +77,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 userAnnotation.username(),
                 false
         );
-        CategoryJson createdCategory = spendApiClient.addCategory(categoryJson);
+        CategoryJson createdCategory = spendDbClient.createCategory(categoryJson);
 
         return isArchived ? archiveCategory(createdCategory) : createdCategory ;
     }
