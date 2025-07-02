@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,16 +59,83 @@ public class CategoryDaoJdbc implements CategoryDao {
                 ps.execute();
                 try (ResultSet rs = ps.getResultSet()) {
                     if (rs.next()) {
-                        CategoryEntity ce = new CategoryEntity();
-                        ce.setId(rs.getObject("id", UUID.class));
-                        ce.setUsername(rs.getString("username"));
-                        ce.setName(rs.getString("name"));
-                        ce.setArchived(rs.getBoolean("archived"));
-                        return Optional.of(ce);
+                        CategoryEntity categoryEntity = new CategoryEntity();
+                        categoryEntity.setId(rs.getObject("id", UUID.class));
+                        categoryEntity.setUsername(rs.getString("username"));
+                        categoryEntity.setName(rs.getString("name"));
+                        categoryEntity.setArchived(rs.getBoolean("archived"));
+                        return Optional.of(categoryEntity);
                     } else {
                         return Optional.empty();
                     }
                 }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+        try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "SELECT * FROM category WHERE username = ? AND category = ?"
+            )) {
+                ps.setObject(1, username);
+                ps.setObject(2, categoryName);
+                ps.execute();
+                try (ResultSet rs = ps.getResultSet()) {
+                    if (rs.next()) {
+                        CategoryEntity categoryEntity = new CategoryEntity();
+                        categoryEntity.setId(rs.getObject("id", UUID.class));
+                        categoryEntity.setUsername(rs.getString("username"));
+                        categoryEntity.setName(rs.getString("name"));
+                        categoryEntity.setArchived(rs.getBoolean("archived"));
+                        return Optional.of(categoryEntity);
+                    } else {
+                        return Optional.empty();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<CategoryEntity> findAllCategoriesByUsername(String username) {
+        try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "SELECT * FROM category WHERE username = ?"
+            )) {
+                ps.setObject(1, username);
+                ps.execute();
+                List<CategoryEntity> categories = new ArrayList<>();
+                try (ResultSet rs = ps.getResultSet()) {
+                    while (rs.next()) {
+                        CategoryEntity categoryEntity = new CategoryEntity();
+                        categoryEntity.setId(rs.getObject("id", UUID.class));
+                        categoryEntity.setUsername(rs.getString("username"));
+                        categoryEntity.setName(rs.getString("name"));
+                        categoryEntity.setArchived(rs.getBoolean("archived"));
+                        categories.add(categoryEntity);
+                    }
+                    return categories;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteCategory(CategoryEntity category) {
+        try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM category WHERE id = ?"
+            )) {
+                ps.setObject(1, category.getId());
+                ps.executeUpdate();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
