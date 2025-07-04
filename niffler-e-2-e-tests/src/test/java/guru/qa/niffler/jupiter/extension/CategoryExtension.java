@@ -75,20 +75,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 null,
                 RandomDataUtils.randomCategoryName(),
                 userAnnotation.username(),
-                false
+                isArchived
         );
-        CategoryJson createdCategory = spendDbClient.createCategory(categoryJson);
-
-        return isArchived ? archiveCategory(createdCategory) : createdCategory ;
-    }
-
-    private CategoryJson archiveCategory(CategoryJson category) {
-        CategoryJson archivedCategoryJson = new CategoryJson(
-                category.id(),
-                category.name(),
-                category.username(),
-                true
-        );
-        return spendApiClient.updateCategory(archivedCategoryJson);
+        return spendDbClient.createCategory(categoryJson);
     }
 }
