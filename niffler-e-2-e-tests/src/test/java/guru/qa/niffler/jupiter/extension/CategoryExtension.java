@@ -3,7 +3,7 @@ package guru.qa.niffler.jupiter.extension;
 import guru.qa.niffler.api.SpendApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
-import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
+
+import java.sql.Connection;
 
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
 
@@ -77,6 +79,6 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 userAnnotation.username(),
                 isArchived
         );
-        return spendDbClient.createCategory(categoryJson);
+        return spendDbClient.createCategory(categoryJson, Connection.TRANSACTION_READ_COMMITTED);
     }
 }
