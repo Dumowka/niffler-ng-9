@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -109,6 +111,33 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
                 } else {
                     return Optional.empty();
                 }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<UserdataUserEntity> findAll() {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM \"user\""
+        )) {
+            preparedStatement.execute();
+            List<UserdataUserEntity> userEntities = new ArrayList<>();
+            try (ResultSet rs = preparedStatement.getResultSet()) {
+                while (rs.next()) {
+                    UserdataUserEntity userdataUserEntity = new UserdataUserEntity();
+                    userdataUserEntity.setId(rs.getObject("id", UUID.class));
+                    userdataUserEntity.setUsername(rs.getString("username"));
+                    userdataUserEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
+                    userdataUserEntity.setFirstname(rs.getString("firstname"));
+                    userdataUserEntity.setSurname(rs.getString("surname"));
+                    userdataUserEntity.setPhoto(rs.getBytes("photo"));
+                    userdataUserEntity.setPhotoSmall(rs.getBytes("photo_small"));
+                    userdataUserEntity.setFullname(rs.getString("full_name"));
+                    userEntities.add(userdataUserEntity);
+                }
+                return userEntities;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

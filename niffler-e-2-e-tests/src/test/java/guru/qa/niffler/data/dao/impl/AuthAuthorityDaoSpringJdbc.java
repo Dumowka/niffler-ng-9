@@ -2,6 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
+import guru.qa.niffler.data.mapper.AuthAuthorityEntityRowMapper;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -19,14 +20,14 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
   }
 
   @Override
-  public List<AuthorityEntity> createAuthority(AuthorityEntity... authority) {
+  public void createAuthority(AuthorityEntity... authority) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
     jdbcTemplate.batchUpdate(
         "INSERT INTO authority (user_id, authority) VALUES (? , ?)",
         new BatchPreparedStatementSetter() {
           @Override
           public void setValues(PreparedStatement ps, int i) throws SQLException {
-            ps.setObject(1, authority[i].getUser().getId());
+            ps.setObject(1, authority[i].getUserId());
             ps.setString(2, authority[i].getAuthority().name());
           }
 
@@ -36,7 +37,14 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
           }
         }
     );
-    // TODO реализовать в дз 5.1
-      return null;
   }
+
+    @Override
+    public List<AuthorityEntity> findAll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        return jdbcTemplate.query(
+                "SELECT * FROM authority",
+                AuthAuthorityEntityRowMapper.instance
+        );
+    }
 }

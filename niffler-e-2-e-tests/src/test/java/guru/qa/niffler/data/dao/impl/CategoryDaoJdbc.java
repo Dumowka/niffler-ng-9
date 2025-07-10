@@ -108,6 +108,7 @@ public class CategoryDaoJdbc implements CategoryDao {
         )) {
             ps.setObject(1, username);
             ps.execute();
+
             List<CategoryEntity> categories = new ArrayList<>();
             try (ResultSet rs = ps.getResultSet()) {
                 while (rs.next()) {
@@ -126,8 +127,30 @@ public class CategoryDaoJdbc implements CategoryDao {
     }
 
     @Override
-    public void deleteCategory(CategoryEntity category) {
+    public List<CategoryEntity> findAll() {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM category"
+        )) {
+            preparedStatement.execute();
+            List<CategoryEntity> categoryEntities = new ArrayList<>();
+            try (ResultSet rs = preparedStatement.getResultSet()) {
+                while (rs.next()) {
+                    CategoryEntity categoryEntity = new CategoryEntity();
+                    categoryEntity.setId(rs.getObject("id", UUID.class));
+                    categoryEntity.setUsername(rs.getString("username"));
+                    categoryEntity.setName(rs.getString("name"));
+                    categoryEntity.setArchived(rs.getBoolean("archived"));
+                    categoryEntities.add(categoryEntity);
+                }
+                return categoryEntities;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Override
+    public void deleteCategory(CategoryEntity category) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "DELETE FROM category WHERE id = ?"
         )) {

@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,6 +58,54 @@ public class AuthUserDaoJdbc implements AuthUserDao {
 
     @Override
     public Optional<AuthUserEntity> findById(UUID id) {
-        return Optional.empty();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM \"user\" WHERE id = ?"
+        )) {
+            ps.setObject(1, id);
+            ps.execute();
+            try (ResultSet rs = ps.getResultSet()) {
+                if (rs.next()) {
+                    AuthUserEntity user = new AuthUserEntity();
+                    user.setId(rs.getObject("id", UUID.class));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setEnabled(rs.getBoolean("enabled"));
+                    user.setAccountNonExpired(rs.getBoolean("account_non_expired"));
+                    user.setAccountNonLocked(rs.getBoolean("account_non_locked"));
+                    user.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
+                    return Optional.of(user);
+                } else {
+                    return Optional.empty();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<AuthUserEntity> findAll() {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM \"user\""
+        )) {
+            preparedStatement.execute();
+            List<AuthUserEntity> userEntities = new ArrayList<>();
+            try (ResultSet rs = preparedStatement.getResultSet()) {
+                while (rs.next()) {
+                    AuthUserEntity user = new AuthUserEntity();
+                    user.setId(rs.getObject("id", UUID.class));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setEnabled(rs.getBoolean("enabled"));
+                    user.setAccountNonExpired(rs.getBoolean("account_non_expired"));
+                    user.setAccountNonLocked(rs.getBoolean("account_non_locked"));
+                    user.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
+                    userEntities.add(user);
+                }
+                return userEntities;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
