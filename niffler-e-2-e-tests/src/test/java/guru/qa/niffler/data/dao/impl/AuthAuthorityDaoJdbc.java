@@ -38,10 +38,6 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
                     }
             );
 
-//            ps.setObject(1, authority.getUser().getId());
-//            ps.setString(2, authority.getAuthority().name());
-
-//            ps.executeUpdate();
             ps.executeBatch();
 
             final UUID generatedKey;
@@ -54,8 +50,6 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
                     throw new SQLException("Can`t find id in ResultSet");
                 }
             }
-//            authority.setId(generatedKey);
-//            return authority;
             return Arrays.asList(authorities);
         } catch (SQLException e) {
             throw new RuntimeException(e);
