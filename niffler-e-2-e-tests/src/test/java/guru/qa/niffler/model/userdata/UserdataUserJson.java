@@ -1,8 +1,8 @@
 package guru.qa.niffler.model.userdata;
 
 import guru.qa.niffler.data.entity.userdata.UserdataUserEntity;
+import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.auth.AuthUserJson;
-import guru.qa.niffler.model.spend.CurrencyValues;
 
 import java.util.UUID;
 
