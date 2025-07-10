@@ -2,6 +2,7 @@ package guru.qa.niffler.test;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.Databases;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoJdbc;
 import guru.qa.niffler.data.dao.impl.AuthUserDaoJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
@@ -10,7 +11,6 @@ import guru.qa.niffler.data.entity.userdata.UserdataUserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.auth.AuthUserJson;
 import guru.qa.niffler.model.auth.Authority;
-import guru.qa.niffler.model.auth.AuthorityJson;
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.spend.SpendJson;
 import guru.qa.niffler.model.userdata.UserdataUserJson;
@@ -78,14 +78,14 @@ public class JdbcTest {
 
                             AuthorityEntity authorityEntity1 = new AuthorityEntity();
                             authorityEntity1.setAuthority(Authority.read);
-                            authorityEntity1.setUser(authUserEntity);
+                            authorityEntity1.setUserId(authUserEntity.getId());
 
                             AuthorityEntity authorityEntity2 = new AuthorityEntity();
                             authorityEntity2.setAuthority(Authority.write);
-                            authorityEntity2.setUser(authUserEntity);
+                            authorityEntity2.setUserId(authUserEntity.getId());
 
-                            createdUser.getAuthorities().add(AuthorityJson.fromEntity(authorityEntity1));
-                            createdUser.getAuthorities().add(AuthorityJson.fromEntity(authorityEntity2));
+                            new AuthAuthorityDaoJdbc(connection).createAuthority(authorityEntity1);
+                            new AuthAuthorityDaoJdbc(connection).createAuthority(authorityEntity2);
                         },
                         CFG.authJdbcUrl()
                 ),

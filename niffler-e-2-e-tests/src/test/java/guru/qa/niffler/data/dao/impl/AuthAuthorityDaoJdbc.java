@@ -2,12 +2,13 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
+import guru.qa.niffler.model.auth.Authority;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -21,15 +22,14 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
     }
 
     @Override
-    public List<AuthorityEntity> createAuthority(AuthorityEntity... authorities) {
+    public void createAuthority(AuthorityEntity... authorities) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO authority (user_id, authority) " +
-                        "VALUES (?, ?)",
-                Statement.RETURN_GENERATED_KEYS
+                        "VALUES (?, ?)"
         )) {
             Arrays.stream(authorities).forEach(authority -> {
                         try {
-                            ps.setObject(1, authority.getUser().getId());
+                            ps.setObject(1, authority.getUserId());
                             ps.setString(2, authority.getAuthority().name());
                             ps.addBatch();
                         } catch (SQLException e) {
@@ -37,20 +37,29 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
                         }
                     }
             );
-
             ps.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-            final UUID generatedKey;
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                int id = 0;
-                if (rs.next()) {
-                    generatedKey = rs.getObject("id", UUID.class);
-                    authorities[id++].setId(generatedKey);
-                } else {
-                    throw new SQLException("Can`t find id in ResultSet");
+    @Override
+    public List<AuthorityEntity> findAll() {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM authority"
+        )) {
+            preparedStatement.execute();
+            List<AuthorityEntity> authorityEntities = new ArrayList<>();
+            try (ResultSet rs = preparedStatement.getResultSet()) {
+                while (rs.next()) {
+                    AuthorityEntity authorityEntity = new AuthorityEntity();
+                    authorityEntity.setId(rs.getObject("id", UUID.class));
+                    authorityEntity.setUserId(rs.getObject("user_id", UUID.class));
+                    authorityEntity.setAuthority(Authority.valueOf(rs.getObject("authority", String.class)));
+                    authorityEntities.add(authorityEntity);
                 }
+                return authorityEntities;
             }
-            return Arrays.asList(authorities);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
