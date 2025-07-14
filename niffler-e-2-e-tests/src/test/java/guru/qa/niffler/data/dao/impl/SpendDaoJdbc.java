@@ -27,7 +27,6 @@ public class SpendDaoJdbc implements SpendDao {
 
     @Override
     public SpendEntity create(SpendEntity spend) {
-
         try (PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO spend (username, spend_date, currency, amount, description, category_id) " +
                         "VALUES ( ?, ?, ?, ?, ?, ?)",
@@ -89,6 +88,32 @@ public class SpendDaoJdbc implements SpendDao {
                 "SELECT * FROM spend WHERE username = ?"
         )) {
             ps.setObject(1, username);
+            ps.execute();
+
+            List<SpendEntity> spends = new ArrayList<>();
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    SpendEntity spendEntity = new SpendEntity();
+                    spendEntity.setId(rs.getObject("id", UUID.class));
+                    spendEntity.setUsername(rs.getString("username"));
+                    spendEntity.setSpendDate(rs.getDate("spend_date"));
+                    spendEntity.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
+                    spendEntity.setAmount(rs.getDouble("amount"));
+                    spendEntity.setDescription(rs.getString("description"));
+                    spends.add(spendEntity);
+                }
+                return spends;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<SpendEntity> findAll() {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM spend"
+        )) {
             ps.execute();
             List<SpendEntity> spends = new ArrayList<>();
             try (ResultSet rs = ps.getResultSet()) {
