@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 
-import java.sql.Connection;
-
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
 
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
@@ -79,6 +77,6 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 userAnnotation.username(),
                 isArchived
         );
-        return spendDbClient.createCategory(categoryJson, Connection.TRANSACTION_READ_COMMITTED);
+        return spendDbClient.createCategory(categoryJson);
     }
 }

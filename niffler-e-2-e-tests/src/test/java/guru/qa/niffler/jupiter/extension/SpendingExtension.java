@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 
-import java.sql.Connection;
 import java.util.Date;
 
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
@@ -65,8 +64,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                         spending.amount(),
                         spending.description(),
                         userAnnotation.username()
-                ),
-                Connection.TRANSACTION_READ_COMMITTED
+                )
         );
     }
 
