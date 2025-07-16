@@ -56,5 +56,54 @@ public class JdbcTest {
 
         System.out.println(createdUser);
     }
+
+
+    /*
+        При установке в UserdataUserEntity username = null пользователь создается в Auth.user и Auth.Authority, но не создается в Userdata.user
+        При установке в AuthorityEntity userId = null пользователь создается в Auth.user, но не создается в Auth.Authority и Userdata.user
+     */
+    @Test
+    void chainedTxTest() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserdataUserJson user = new UserdataUserJson(
+                null,
+                "dzhirnov-7",
+                CurrencyValues.RUB,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        UserdataUserJson createdUser = usersDbClient.createUserChained(user);
+
+        System.out.println(createdUser);
+    }
+
+    /*
+        При установке в UserdataUserEntity username = null пользователь не создается в Auth.user, Auth.Authority и Userdata.user
+        При установке в AuthorityEntity userId = null пользователь не создается в Auth.user, Auth.Authority и Userdata.user
+     */
+    @Test
+    void chainedTxSpringJdbcTest() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserdataUserJson user = new UserdataUserJson(
+                null,
+                "dzhirnov-8",
+                CurrencyValues.RUB,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        UserdataUserJson createdUser = usersDbClient.createUserSpringJdbcChained(user);
+
+        System.out.println(createdUser);
+    }
 }
 
