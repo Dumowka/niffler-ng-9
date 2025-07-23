@@ -1,6 +1,6 @@
 package guru.qa.niffler.model.userdata;
 
-import guru.qa.niffler.data.entity.userdata.UserdataUserEntity;
+import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.auth.AuthUserJson;
 
@@ -29,7 +29,7 @@ public record UserdataUserJson(
       );
   }
 
-  public static UserdataUserJson fromEntity(UserdataUserEntity entity) {
+  public static UserdataUserJson fromEntity(UserEntity entity) {
       return new UserdataUserJson(
               entity.getId(),
               entity.getUsername(),

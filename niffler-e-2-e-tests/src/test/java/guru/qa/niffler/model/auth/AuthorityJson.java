@@ -1,5 +1,6 @@
 package guru.qa.niffler.model.auth;
 
+import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 
 import java.util.UUID;
@@ -13,7 +14,7 @@ public record AuthorityJson(
     return new AuthorityJson(
             entity.getId(),
             entity.getAuthority(),
-            entity.getUserId()
+            entity.getUser().getId()
     );
   }
 }

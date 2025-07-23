@@ -11,11 +11,11 @@ import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
+import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
-import guru.qa.niffler.data.entity.userdata.UserdataUserEntity;
+import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.tpl.DataSources;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
-import guru.qa.niffler.model.auth.Authority;
 import guru.qa.niffler.model.userdata.UserdataUserJson;
 import org.springframework.data.transaction.ChainedTransactionManager;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -75,7 +75,7 @@ public class UsersDbClient {
             AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                     e -> {
                         AuthorityEntity ae = new AuthorityEntity();
-                        ae.setUserId(createdAuthUser.getId());
+                        ae.setUser(createdAuthUser);
                         ae.setAuthority(e);
                         return ae;
                     }
@@ -83,7 +83,7 @@ public class UsersDbClient {
 
             authAuthorityDaoSpring.createAuthority(authorityEntities);
             return UserdataUserJson.fromEntity(
-                    userdataUserDaoSpring.createUser(UserdataUserEntity.fromJson(user))
+                    userdataUserDaoSpring.createUser(UserEntity.fromJson(user))
             );
         });
     }
@@ -103,7 +103,7 @@ public class UsersDbClient {
             AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                     e -> {
                         AuthorityEntity ae = new AuthorityEntity();
-                        ae.setUserId(createdAuthUser.getId());
+                        ae.setUser(createdAuthUser);
                         ae.setAuthority(e);
                         return ae;
                     }
@@ -111,7 +111,7 @@ public class UsersDbClient {
 
             authAuthorityDao.createAuthority(authorityEntities);
             return UserdataUserJson.fromEntity(
-                    userdataUserDao.createUser(UserdataUserEntity.fromJson(user))
+                    userdataUserDao.createUser(UserEntity.fromJson(user))
             );
         });
     }
@@ -131,7 +131,7 @@ public class UsersDbClient {
             AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                     e -> {
                         AuthorityEntity ae = new AuthorityEntity();
-                        ae.setUserId(createdAuthUser.getId());
+                        ae.setUser(createdAuthUser);
                         ae.setAuthority(e);
                         return ae;
                     }
@@ -139,7 +139,7 @@ public class UsersDbClient {
 
             authAuthorityDaoSpring.createAuthority(authorityEntities);
             return UserdataUserJson.fromEntity(
-                    userdataUserDaoSpring.createUser(UserdataUserEntity.fromJson(user))
+                    userdataUserDaoSpring.createUser(UserEntity.fromJson(user))
             );
         });
     }
@@ -159,7 +159,7 @@ public class UsersDbClient {
             AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                     e -> {
                         AuthorityEntity ae = new AuthorityEntity();
-                        ae.setUserId(createdAuthUser.getId());
+                        ae.setUser(createdAuthUser);
                         ae.setAuthority(e);
                         return ae;
                     }
@@ -167,7 +167,7 @@ public class UsersDbClient {
 
             authAuthorityDao.createAuthority(authorityEntities);
             return UserdataUserJson.fromEntity(
-                    userdataUserDao.createUser(UserdataUserEntity.fromJson(user))
+                    userdataUserDao.createUser(UserEntity.fromJson(user))
             );
         });
     }
