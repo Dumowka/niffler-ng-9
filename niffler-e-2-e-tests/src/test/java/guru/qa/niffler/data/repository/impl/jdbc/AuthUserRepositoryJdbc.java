@@ -1,4 +1,4 @@
-package guru.qa.niffler.data.repository.impl;
+package guru.qa.niffler.data.repository.impl.jdbc;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
@@ -74,7 +74,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
-                "SELECT * FROM \"user\" u JOIN authority a on u.id = a.user_id WHERE id = ?"
+                "SELECT * FROM \"user\" u JOIN authority a on u.id = a.user_id WHERE u.id = ?"
         )) {
             ps.setObject(1, id);
             ps.execute();
