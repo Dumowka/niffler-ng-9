@@ -2,7 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.UserdataUserDao;
-import guru.qa.niffler.data.entity.userdata.UserdataUserEntity;
+import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
 import java.sql.PreparedStatement;
@@ -21,7 +21,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     private static final Config CFG = Config.getInstance();
 
     @Override
-    public UserdataUserEntity createUser(UserdataUserEntity user) {
+    public UserEntity createUser(UserEntity user) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "INSERT INTO \"user\" (username, currency, firstname, surname, photo, photo_small, full_name) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -53,7 +53,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
 
     @Override
-    public Optional<UserdataUserEntity> findUserById(UUID id) {
+    public Optional<UserEntity> findUserById(UUID id) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\" WHERE id = ?",
                 Statement.RETURN_GENERATED_KEYS
@@ -63,16 +63,16 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
 
             try (ResultSet rs = ps.getResultSet()) {
                 if (rs.next()) {
-                    UserdataUserEntity userdataUserEntity = new UserdataUserEntity();
-                    userdataUserEntity.setId(rs.getObject("id", UUID.class));
-                    userdataUserEntity.setUsername(rs.getString("username"));
-                    userdataUserEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
-                    userdataUserEntity.setFirstname(rs.getString("firstname"));
-                    userdataUserEntity.setSurname(rs.getString("surname"));
-                    userdataUserEntity.setPhoto(rs.getBytes("photo"));
-                    userdataUserEntity.setPhotoSmall(rs.getBytes("photo_small"));
-                    userdataUserEntity.setFullname(rs.getString("full_name"));
-                    return Optional.of(userdataUserEntity);
+                    UserEntity userEntity = new UserEntity();
+                    userEntity.setId(rs.getObject("id", UUID.class));
+                    userEntity.setUsername(rs.getString("username"));
+                    userEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
+                    userEntity.setFirstname(rs.getString("firstname"));
+                    userEntity.setSurname(rs.getString("surname"));
+                    userEntity.setPhoto(rs.getBytes("photo"));
+                    userEntity.setPhotoSmall(rs.getBytes("photo_small"));
+                    userEntity.setFullname(rs.getString("full_name"));
+                    return Optional.of(userEntity);
                 } else {
                     return Optional.empty();
                 }
@@ -83,7 +83,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
 
     @Override
-    public Optional<UserdataUserEntity> findUserByUsername(String username) {
+    public Optional<UserEntity> findUserByUsername(String username) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\" WHERE username = ?",
                 Statement.RETURN_GENERATED_KEYS
@@ -93,16 +93,16 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
 
             try (ResultSet rs = ps.getResultSet()) {
                 if (rs.next()) {
-                    UserdataUserEntity userdataUserEntity = new UserdataUserEntity();
-                    userdataUserEntity.setId(rs.getObject("id", UUID.class));
-                    userdataUserEntity.setUsername(rs.getString("username"));
-                    userdataUserEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
-                    userdataUserEntity.setFirstname(rs.getString("firstname"));
-                    userdataUserEntity.setSurname(rs.getString("surname"));
-                    userdataUserEntity.setPhoto(rs.getBytes("photo"));
-                    userdataUserEntity.setPhotoSmall(rs.getBytes("photo_small"));
-                    userdataUserEntity.setFullname(rs.getString("full_name"));
-                    return Optional.of(userdataUserEntity);
+                    UserEntity userEntity = new UserEntity();
+                    userEntity.setId(rs.getObject("id", UUID.class));
+                    userEntity.setUsername(rs.getString("username"));
+                    userEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
+                    userEntity.setFirstname(rs.getString("firstname"));
+                    userEntity.setSurname(rs.getString("surname"));
+                    userEntity.setPhoto(rs.getBytes("photo"));
+                    userEntity.setPhotoSmall(rs.getBytes("photo_small"));
+                    userEntity.setFullname(rs.getString("full_name"));
+                    return Optional.of(userEntity);
                 } else {
                     return Optional.empty();
                 }
@@ -113,24 +113,24 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
 
     @Override
-    public List<UserdataUserEntity> findAll() {
+    public List<UserEntity> findAll() {
         try (PreparedStatement preparedStatement = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\""
         )) {
             preparedStatement.execute();
-            List<UserdataUserEntity> userEntities = new ArrayList<>();
+            List<UserEntity> userEntities = new ArrayList<>();
             try (ResultSet rs = preparedStatement.getResultSet()) {
                 while (rs.next()) {
-                    UserdataUserEntity userdataUserEntity = new UserdataUserEntity();
-                    userdataUserEntity.setId(rs.getObject("id", UUID.class));
-                    userdataUserEntity.setUsername(rs.getString("username"));
-                    userdataUserEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
-                    userdataUserEntity.setFirstname(rs.getString("firstname"));
-                    userdataUserEntity.setSurname(rs.getString("surname"));
-                    userdataUserEntity.setPhoto(rs.getBytes("photo"));
-                    userdataUserEntity.setPhotoSmall(rs.getBytes("photo_small"));
-                    userdataUserEntity.setFullname(rs.getString("full_name"));
-                    userEntities.add(userdataUserEntity);
+                    UserEntity userEntity = new UserEntity();
+                    userEntity.setId(rs.getObject("id", UUID.class));
+                    userEntity.setUsername(rs.getString("username"));
+                    userEntity.setCurrency(rs.getObject("currency", CurrencyValues.class));
+                    userEntity.setFirstname(rs.getString("firstname"));
+                    userEntity.setSurname(rs.getString("surname"));
+                    userEntity.setPhoto(rs.getBytes("photo"));
+                    userEntity.setPhotoSmall(rs.getBytes("photo_small"));
+                    userEntity.setFullname(rs.getString("full_name"));
+                    userEntities.add(userEntity);
                 }
                 return userEntities;
             }
@@ -140,7 +140,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
 
     @Override
-    public void deleteUser(UserdataUserEntity user) {
+    public void deleteUser(UserEntity user) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "DELETE FROM \"user\" WHERE id = ?"
         )) {
