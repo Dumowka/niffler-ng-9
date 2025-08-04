@@ -102,6 +102,12 @@ public class AuthUserRepositorySpring implements AuthUserRepository {
     }
 
     @Override
+    public Optional<AuthUserEntity> findByUsername(String username) {
+        // TODO Реализовать в дз 6.2
+        return Optional.empty();
+    }
+
+    @Override
     public List<AuthUserEntity> findAll() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         return jdbcTemplate.query(

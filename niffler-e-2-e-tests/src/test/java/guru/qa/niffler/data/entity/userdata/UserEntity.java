@@ -1,7 +1,7 @@
 package guru.qa.niffler.data.entity.userdata;
 
 import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.userdata.UserdataUserJson;
+import guru.qa.niffler.model.userdata.UserJson;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -113,7 +113,7 @@ public class UserEntity implements Serializable {
     }
   }
 
-  public static UserEntity fromJson(UserdataUserJson json) {
+  public static UserEntity fromJson(UserJson json) {
     UserEntity userEntity = new UserEntity();
     userEntity.setId(json.id());
     userEntity.setUsername(json.username());

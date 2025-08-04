@@ -6,7 +6,7 @@ import guru.qa.niffler.model.auth.AuthUserJson;
 
 import java.util.UUID;
 
-public record UserdataUserJson(
+public record UserJson(
         UUID id,
         String username,
         CurrencyValues currency,
@@ -16,8 +16,8 @@ public record UserdataUserJson(
         byte[] photo,
         byte[] photoSmall
 ) {
-  public static UserdataUserJson fromAuthUserJson(AuthUserJson authUserJson) {
-      return new UserdataUserJson(
+  public static UserJson fromAuthUserJson(AuthUserJson authUserJson) {
+      return new UserJson(
               authUserJson.getId(),
               authUserJson.getUsername(),
               CurrencyValues.RUB,
@@ -29,8 +29,8 @@ public record UserdataUserJson(
       );
   }
 
-  public static UserdataUserJson fromEntity(UserEntity entity) {
-      return new UserdataUserJson(
+  public static UserJson fromEntity(UserEntity entity) {
+      return new UserJson(
               entity.getId(),
               entity.getUsername(),
               entity.getCurrency(),

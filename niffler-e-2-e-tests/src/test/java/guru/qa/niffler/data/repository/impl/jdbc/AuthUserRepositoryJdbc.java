@@ -106,6 +106,12 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
 
     @Override
+    public Optional<AuthUserEntity> findByUsername(String username) {
+        // TODO Реализовать в дз 6.2
+        return Optional.empty();
+    }
+
+    @Override
     public List<AuthUserEntity> findAll() {
         try (PreparedStatement preparedStatement = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\""
