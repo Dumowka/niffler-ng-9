@@ -3,7 +3,7 @@ package guru.qa.niffler.test;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.spend.SpendJson;
-import guru.qa.niffler.model.userdata.UserdataUserJson;
+import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UsersDbClient;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class JdbcTest {
     void xaTxTest() {
         UsersDbClient usersDbClient = new UsersDbClient();
 
-        UserdataUserJson user = new UserdataUserJson(
+        UserJson user = new UserJson(
                 null,
                 "dzhirnov-6",
                 CurrencyValues.RUB,
@@ -52,7 +52,7 @@ public class JdbcTest {
                 null
         );
 
-        UserdataUserJson createdUser = usersDbClient.createUserSpringJdbc(user);
+        UserJson createdUser = usersDbClient.createUserSpringJdbc(user);
 
         System.out.println(createdUser);
     }
@@ -66,7 +66,7 @@ public class JdbcTest {
     void chainedTxTest() {
         UsersDbClient usersDbClient = new UsersDbClient();
 
-        UserdataUserJson user = new UserdataUserJson(
+        UserJson user = new UserJson(
                 null,
                 "dzhirnov-7",
                 CurrencyValues.RUB,
@@ -77,7 +77,7 @@ public class JdbcTest {
                 null
         );
 
-        UserdataUserJson createdUser = usersDbClient.createUserChained(user);
+        UserJson createdUser = usersDbClient.createUserChained(user);
 
         System.out.println(createdUser);
     }
@@ -90,7 +90,7 @@ public class JdbcTest {
     void chainedTxSpringJdbcTest() {
         UsersDbClient usersDbClient = new UsersDbClient();
 
-        UserdataUserJson user = new UserdataUserJson(
+        UserJson user = new UserJson(
                 null,
                 "dzhirnov-8",
                 CurrencyValues.RUB,
@@ -101,7 +101,7 @@ public class JdbcTest {
                 null
         );
 
-        UserdataUserJson createdUser = usersDbClient.createUserSpringJdbcChained(user);
+        UserJson createdUser = usersDbClient.createUserSpringJdbcChained(user);
 
         System.out.println(createdUser);
     }
