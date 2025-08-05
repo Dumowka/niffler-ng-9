@@ -1,5 +1,7 @@
 package guru.qa.niffler.data.entity.auth;
 
+import guru.qa.niffler.model.auth.AuthUserJson;
+import guru.qa.niffler.model.auth.AuthorityJson;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,6 +63,27 @@ public class AuthUserEntity implements Serializable {
   public void removeAuthority(AuthorityEntity authority) {
     this.authorities.remove(authority);
     authority.setUser(null);
+  }
+
+  public static AuthUserEntity fromJson(AuthUserJson authUserJson) {
+    AuthUserEntity authUserEntity = new AuthUserEntity();
+    authUserEntity.id = authUserJson.getId();
+    authUserEntity.username = authUserJson.getUsername();
+    authUserEntity.password = authUserJson.getPassword();
+    authUserEntity.enabled = authUserJson.getEnabled();
+    authUserEntity.accountNonExpired = authUserJson.getAccountNonExpired();
+    authUserEntity.accountNonLocked = authUserJson.getAccountNonLocked();
+    authUserEntity.credentialsNonExpired = authUserJson.getCredentialsNonExpired();
+
+    for (AuthorityJson authorityJson : authUserJson.getAuthorities()) {
+      AuthorityEntity authority = new AuthorityEntity();
+      authority.setId(authorityJson.id());
+      authority.setAuthority(authorityJson.authority());
+      authority.setUser(authUserEntity);
+      authUserEntity.authorities.add(authority);
+    }
+
+    return authUserEntity;
   }
 
   @Override

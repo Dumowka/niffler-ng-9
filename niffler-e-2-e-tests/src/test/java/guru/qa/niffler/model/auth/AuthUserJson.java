@@ -1,7 +1,10 @@
 package guru.qa.niffler.model.auth;
 
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -10,6 +13,9 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 public class AuthUserJson {
     private UUID id;
     private String username;

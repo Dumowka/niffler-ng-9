@@ -2,13 +2,16 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.SpendDao;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.mapper.SpendEntityRowMapper;
 import guru.qa.niffler.data.tpl.DataSources;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -44,15 +47,32 @@ public class SpendDaoSpringJdbc implements SpendDao {
     }
 
     @Override
-    public Optional<SpendEntity> findSpendById(Long id) {
+    public SpendEntity update(SpendEntity spend) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
-        return Optional.ofNullable(
-                jdbcTemplate.queryForObject(
-                        "SELECT * FROM spend WHERE id = ?",
-                        SpendEntityRowMapper.instance,
-                        id
-                )
+        jdbcTemplate.update(
+                "UPDATE spend SET spend_date = ?, currency = ?, amount = ?, description = ? WHERE id = ?",
+                new Date(spend.getSpendDate().getTime()),
+                spend.getCurrency().name(),
+                spend.getAmount(),
+                spend.getDescription(),
+                spend.getId()
         );
+        return spend;
+    }
+
+    @Override
+    public Optional<SpendEntity> findSpendById(UUID id) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
+        try {
+            SpendEntity spendEntity = jdbcTemplate.queryForObject(
+                    "SELECT s.*, c.* FROM spend s JOIN category c ON s.category_id = c.id WHERE s.id = ?",
+                    SpendEntityRowMapper.instance,
+                    id
+            );
+            return Optional.of(spendEntity);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -63,6 +83,25 @@ public class SpendDaoSpringJdbc implements SpendDao {
                 SpendEntityRowMapper.instance,
                 username
         );
+    }
+
+    @Override
+    public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.spendJdbcUrl()));
+        try {
+            SpendEntity spendEntity = jdbcTemplate.queryForObject(
+                    "SELECT s.*, c.* FROM spend s JOIN category c ON s.category_id = c.id WHERE s.username = ? AND s.description = ?",
+                    SpendEntityRowMapper.instance,
+                    username,
+                    description
+            );
+            CategoryEntity category = new CategoryEntity();
+            category.setId(spendEntity.getCategory().getId());
+            spendEntity.setCategory(category);
+            return Optional.of(spendEntity);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

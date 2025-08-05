@@ -20,7 +20,7 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
     private final EntityManager entityManager = em(CFG.userdataJdbcUrl());
 
     @Override
-    public UserEntity createUser(UserEntity userEntity) {
+    public UserEntity create(UserEntity userEntity) {
         entityManager.joinTransaction();
         entityManager.persist(userEntity);
         return userEntity;
@@ -48,19 +48,22 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
 
     @Override
     public List<UserEntity> findAll() {
-        // TODO Реализовать в дз 6.2
-        return List.of();
+        return entityManager.createQuery("SELECT u FROM UserEntity u", UserEntity.class).getResultList();
     }
 
     @Override
-    public void deleteUser(UserEntity user) {
-        // TODO Реализовать в дз 6.2
+    public UserEntity update(UserEntity user) {
+        entityManager.joinTransaction();
+        entityManager.merge(user);
+        return user;
     }
 
     @Override
-    public void addIncomeInvitation(UserEntity requester, UserEntity addressee) {
+    public void addInvitation(UserEntity requester, UserEntity addressee) {
         entityManager.joinTransaction();
         addressee.addFriends(FriendshipStatus.PENDING, requester);
+        entityManager.merge(requester);
+        entityManager.merge(addressee);
     }
 
     @Override
@@ -68,5 +71,13 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
         entityManager.joinTransaction();
         requester.addFriends(FriendshipStatus.ACCEPTED, addressee);
         addressee.addFriends(FriendshipStatus.ACCEPTED, requester);
+        entityManager.merge(requester);
+        entityManager.merge(addressee);
+    }
+
+    @Override
+    public void remove(UserEntity user) {
+        entityManager.joinTransaction();
+        entityManager.remove(user);
     }
 }
