@@ -13,20 +13,22 @@ import guru.qa.niffler.data.tpl.DataSources;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.auth.AuthUserJson;
+import guru.qa.niffler.model.userdata.FriendshipStatus;
 import guru.qa.niffler.model.userdata.UserJson;
-import guru.qa.niffler.service.UserClient;
+import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UsersDbClient implements UserClient {
+public class UsersDbClient implements UsersClient {
 
     private static final Config CFG = Config.getInstance();
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -54,7 +56,8 @@ public class UsersDbClient implements UserClient {
         return xaTransactionTemplate.execute(() -> {
             authUserRepository.create(authUserEntity(username, password));
             return UserJson.fromEntity(
-                    userdataUserRepository.create(userEntity(username))
+                    userdataUserRepository.create(userEntity(username)),
+                    null
             );
         });
     }
@@ -87,61 +90,65 @@ public class UsersDbClient implements UserClient {
 
     @Override
     public UserJson update(UserJson userJson) {
-        return xaTransactionTemplate.execute(() -> UserJson.fromEntity(userdataUserRepository.update(UserEntity.fromJson(userJson))));
+        return xaTransactionTemplate.execute(() -> UserJson.fromEntity(userdataUserRepository.update(UserEntity.fromJson(userJson)), null));
     }
 
     @Override
     public Optional<UserJson> getUserById(UUID id) {
-        return userdataUserRepository.findById(id).map(UserJson::fromEntity);
+        return userdataUserRepository.findById(id).map(user -> UserJson.fromEntity(user, null));
     }
 
     @Override
     public Optional<UserJson> getUserByName(String username) {
-        return userdataUserRepository.findByUsername(username).map(UserJson::fromEntity);
+        return userdataUserRepository.findByUsername(username).map(user -> UserJson.fromEntity(user, null));
     }
 
     @Override
-    public void createIncomeInvitation(UserJson targetUser, int count) {
+    public List<UserJson> addIncomeInvitation(UserJson targetUser, int count) {
+        final List<UserJson> result = new ArrayList<>();
         if (count > 0) {
             UserEntity targetEntity = userdataUserRepository.findById(
                     targetUser.id()
             ).orElseThrow();
-
             for (int i = 0; i < count; i++) {
                 xaTransactionTemplate.execute(() -> {
                     String username = RandomDataUtils.randomUsername();
-
                     AuthUserEntity authUser = authUserEntity(username, "12345");
                     authUserRepository.create(authUser);
                     UserEntity addressee = userdataUserRepository.create(userEntity(username));
-
                     userdataUserRepository.addInvitation(targetEntity, addressee);
+                    result.add(UserJson.fromEntity(
+                            addressee, FriendshipStatus.INVITE_RECEIVED
+                    ));
                     return null;
                 });
             }
         }
+        return result;
     }
 
     @Override
-    public void createOutcomeInvitation(UserJson targetUser, int count) {
+    public List<UserJson> addOutcomeInvitation(UserJson targetUser, int count) {
+        final List<UserJson> result = new ArrayList<>();
         if (count > 0) {
             UserEntity targetEntity = userdataUserRepository.findById(
                     targetUser.id()
             ).orElseThrow();
-
             for (int i = 0; i < count; i++) {
                 xaTransactionTemplate.execute(() -> {
                     String username = RandomDataUtils.randomUsername();
-
                     AuthUserEntity authUser = authUserEntity(username, "12345");
                     authUserRepository.create(authUser);
                     UserEntity addressee = userdataUserRepository.create(userEntity(username));
-
                     userdataUserRepository.addInvitation(addressee, targetEntity);
+                    result.add(UserJson.fromEntity(
+                            addressee, FriendshipStatus.INVITE_RECEIVED
+                    ));
                     return null;
                 });
             }
         }
+        return result;
     }
 
     @Override
@@ -157,25 +164,27 @@ public class UsersDbClient implements UserClient {
     }
 
     @Override
-    public void createFriend(UserJson targetUser, int count) {
+    public List<UserJson> addFriend(UserJson targetUser, int count) {
+        final List<UserJson> result = new ArrayList<>();
         if (count > 0) {
             UserEntity targetEntity = userdataUserRepository.findById(
                     targetUser.id()
             ).orElseThrow();
-
             for (int i = 0; i < count; i++) {
                 xaTransactionTemplate.execute(() -> {
                     String username = RandomDataUtils.randomUsername();
-
                     AuthUserEntity authUser = authUserEntity(username, "12345");
                     authUserRepository.create(authUser);
                     UserEntity addressee = userdataUserRepository.create(userEntity(username));
-
                     userdataUserRepository.addFriend(targetEntity, addressee);
+                    result.add(UserJson.fromEntity(
+                            addressee, FriendshipStatus.FRIEND
+                    ));
                     return null;
                 });
             }
         }
+        return result;
     }
 
     @Override

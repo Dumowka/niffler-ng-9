@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserClient {
+public interface UsersClient {
     UserJson createUser(String username, String password);
 
     AuthUserJson update(AuthUserJson authUserJson);
@@ -24,13 +24,13 @@ public interface UserClient {
 
     Optional<UserJson> getUserByName(String username);
 
-    void createIncomeInvitation(UserJson targetUser, int count);
+    List<UserJson> addIncomeInvitation(UserJson targetUser, int count);
 
-    void createOutcomeInvitation(UserJson targetUser, int count);
+    List<UserJson> addOutcomeInvitation(UserJson targetUser, int count);
 
     void removeUser(AuthUserJson authUserJson);
 
-    void createFriend(UserJson targetUser, int count);
+    List<UserJson> addFriend(UserJson targetUser, int count);
 
     void addFriend(UserJson requester, UserJson addressee);
 }

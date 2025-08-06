@@ -61,7 +61,9 @@ public class UserDbTest {
                 user.surname(),
                 user.fullname(),
                 user.photo(),
-                user.photoSmall()
+                user.photoSmall(),
+                null,
+                null
         );
         UserJson receivedUser = usersDbClient.update(updatedUser);
         System.out.println(receivedUser);
@@ -78,13 +80,13 @@ public class UserDbTest {
     @Test
     void checkIncomeInvitation() {
         UserJson requester = usersDbClient.createUser(RandomDataUtils.randomUsername(), "12345");
-        usersDbClient.createIncomeInvitation(requester, 1);
+        usersDbClient.addIncomeInvitation(requester, 1);
     }
 
     @Test
     void checkOutcomeInvitation() {
         UserJson requester = usersDbClient.createUser(RandomDataUtils.randomUsername(), "12345");
-        usersDbClient.createOutcomeInvitation(requester, 1);
+        usersDbClient.addOutcomeInvitation(requester, 1);
     }
 
     @Test
