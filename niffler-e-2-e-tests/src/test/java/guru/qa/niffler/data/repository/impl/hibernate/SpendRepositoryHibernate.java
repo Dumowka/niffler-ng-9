@@ -5,7 +5,6 @@ import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.repository.SpendRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -48,59 +47,49 @@ public class SpendRepositoryHibernate implements SpendRepository {
 
     @Override
     public Optional<CategoryEntity> findCategoryById(UUID id) {
-        try {
-            return Optional.of(entityManager.find(CategoryEntity.class, id));
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        CategoryEntity entity = entityManager.find(CategoryEntity.class, id);
+        return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
     public Optional<CategoryEntity> findCategoryByUsernameAndName(String username, String name) {
-        try {
-            return Optional.of(
-                    entityManager.createQuery("SELECT c FROM CategoryEntity c WHERE c.username =: username AND c.name =: name", CategoryEntity.class)
-                            .setParameter("username", username)
-                            .setParameter("name", name)
-                            .getSingleResult()
-            );
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        CategoryEntity entity = entityManager.createQuery("SELECT c FROM CategoryEntity c WHERE c.username =: username AND c.name =: name", CategoryEntity.class)
+                .setParameter("username", username)
+                .setParameter("name", name)
+                .getSingleResult();
+        return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
     public Optional<SpendEntity> findById(UUID id) {
-       try {
-           return Optional.of(entityManager.find(SpendEntity.class, id));
-       } catch (NoResultException e) {
-           return Optional.empty();
-       }
+        SpendEntity entity = entityManager.find(SpendEntity.class, id);
+        return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
     public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
-        try {
-            return Optional.of(
-                    entityManager.createQuery("SELECT s FROM SpendEntity s WHERE s.username =: username AND s.description =: description", SpendEntity.class)
-                            .setParameter("username", username)
-                            .setParameter("description", description)
-                            .getSingleResult()
-            );
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        SpendEntity entity = entityManager.createQuery("SELECT s FROM SpendEntity s WHERE s.username =: username AND s.description =: description", SpendEntity.class)
+                .setParameter("username", username)
+                .setParameter("description", description)
+                .getSingleResult();
+        return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
     public void remove(SpendEntity spend) {
         entityManager.joinTransaction();
+        if (!entityManager.contains(spend)) {
+            spend = entityManager.merge(spend);
+        }
         entityManager.remove(spend);
     }
 
     @Override
     public void removeCategory(CategoryEntity category) {
         entityManager.joinTransaction();
+        if (!entityManager.contains(category)) {
+            category = entityManager.merge(category);
+        }
         entityManager.remove(category);
     }
 }

@@ -94,7 +94,6 @@ public class UserDbTest {
         usersDbClient.addFriend(requester, addressee);
     }
 
-    // Падает тест при реализации Hibernate с ошибкой java.lang.IllegalArgumentException: Removing a detached instance guru.qa.niffler.data.entity.auth.AuthUserEntity#c07f33d0-24e7-4031-9d4f-d4766ea27f98
     @Test
     void removeUser() {
         AuthUserJson userJson = usersDbClient.getAuthUserByName(name).get();

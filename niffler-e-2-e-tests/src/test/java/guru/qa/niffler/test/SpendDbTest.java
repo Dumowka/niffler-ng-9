@@ -8,11 +8,12 @@ import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
-import java.util.UUID;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SpendDbTest {
     private final SpendDbClient spendDbClient = new SpendDbClient();
@@ -89,7 +90,6 @@ public class SpendDbTest {
         assertEquals(categoryJson, categoryById);
     }
 
-    // Падает с ошибкой java.lang.IllegalArgumentException: Removing a detached instance guru.qa.niffler.data.entity.spend.CategoryEntity#6182b611-4f63-416b-a55d-0edeafdab1dc
     @Test
     void checkRemoveCategory() {
         CategoryJson categoryJson = spendDbClient.createCategory(generateNewCategory());
@@ -98,17 +98,17 @@ public class SpendDbTest {
         assertNull(categoryAfterRemoving);
     }
 
-    // Падает с ошибкой java.lang.IllegalArgumentException: Removing a detached instance guru.qa.niffler.data.entity.spend.CategoryEntity#f911948c-717c-4619-af30-947e7bea7fbc
     @Test
     void checkRemoveCategoryWithSpend() {
-        SpendJson spendJson = spendDbClient.create(generateNewSpend());
-        CategoryJson categoryJson = spendJson.category();
-        UUID categoryId = categoryJson.id();
-        spendDbClient.removeCategory(categoryJson);
-        SpendJson afterRemovingSpend = spendDbClient.findById(spendJson.id()).orElse(null);
-        CategoryJson afterRemovingCategory = spendDbClient.findCategoryById(categoryId).orElse(null);
-        assertNull(afterRemovingSpend);
-        assertNull(afterRemovingCategory);
+        SpendJson createdSpend = spendDbClient.create(generateNewSpend());
+        spendDbClient.remove(createdSpend);
+        spendDbClient.removeCategory(createdSpend.category());
+
+        Optional<SpendJson> removedSpend = spendDbClient.findById(createdSpend.id());
+        Optional<CategoryJson> removedCategory = spendDbClient.findCategoryById(createdSpend.category().id());
+
+        assertTrue(removedSpend.isEmpty());
+        assertTrue(removedCategory.isEmpty());
     }
 
     private CategoryJson generateNewCategory() {

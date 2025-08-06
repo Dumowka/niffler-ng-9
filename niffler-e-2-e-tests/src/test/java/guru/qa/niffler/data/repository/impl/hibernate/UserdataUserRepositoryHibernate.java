@@ -5,7 +5,6 @@ import guru.qa.niffler.data.entity.userdata.FriendshipStatus;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,22 +27,16 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
 
     @Override
     public Optional<UserEntity> findById(UUID id) {
-        return Optional.ofNullable(
-                entityManager.find(UserEntity.class, id)
-        );
+        UserEntity entity = entityManager.find(UserEntity.class, id);
+        return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        try {
-            return Optional.of(
-                    entityManager.createQuery("SELECT u FROM UserEntity u WHERE u.username =: username", UserEntity.class)
-                    .setParameter("username", username)
-                    .getSingleResult()
-            );
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        UserEntity entity = entityManager.createQuery("SELECT u FROM UserEntity u WHERE u.username =: username", UserEntity.class)
+                .setParameter("username", username)
+                .getSingleResult();
+        return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
@@ -78,6 +71,9 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
     @Override
     public void remove(UserEntity user) {
         entityManager.joinTransaction();
+        if (!entityManager.contains(user)) {
+            user = entityManager.merge(user);
+        }
         entityManager.remove(user);
     }
 }
