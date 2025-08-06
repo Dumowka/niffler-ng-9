@@ -7,6 +7,7 @@ import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.mapper.UserdataUserEntityRowMapper;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
 import guru.qa.niffler.data.tpl.DataSources;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -50,7 +51,7 @@ public class UserdataUserRepositorySpring implements UserdataUserRepository {
             "VALUES (?, ?, ?, ?)";
 
     @Override
-    public UserEntity createUser(UserEntity user) {
+    public UserEntity create(UserEntity user) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
         KeyHolder kh = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
@@ -110,7 +111,7 @@ public class UserdataUserRepositorySpring implements UserdataUserRepository {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
 
         UserEntity user = jdbcTemplate.queryForObject(
-                "SELECT * FROM \"user\" WHERE id = ?",
+                "SELECT * FROM \"user\" WHERE username = ?",
                 UserdataUserEntityRowMapper.instance,
                 username
         );
@@ -169,7 +170,66 @@ public class UserdataUserRepositorySpring implements UserdataUserRepository {
     }
 
     @Override
-    public void deleteUser(UserEntity user) {
+    public UserEntity update(UserEntity user) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
+        jdbcTemplate.update("UPDATE \"user\" SET currency = ?, firstname = ?, surname = ?, photo = ?, " +
+                        "photo_small = ? WHERE id = ?",
+                user.getCurrency().name(), user.getFirstname(), user.getSurname(), user.getPhoto(),
+                user.getPhotoSmall(), user.getId());
+
+        FriendshipEntity[] friendshipEntities = user.getFriendshipRequests().toArray(new FriendshipEntity[0]);
+        jdbcTemplate.batchUpdate(
+                "INSERT INTO friendship (requester_id, addressee_id, status) VALUES (?, ?, ?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setObject(1, user.getId());
+                        ps.setString(2, String.valueOf(friendshipEntities[i].getAddressee().getId()));
+                        ps.setString(3, friendshipEntities[i].getStatus().name());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return friendshipEntities.length;
+                    }
+                }
+        );
+        return user;
+    }
+
+    @Override
+    public void addInvitation(UserEntity requester, UserEntity addressee) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
+        jdbcTemplate.update(
+                ADD_INVITATION_SQL,
+                requester.getId(),
+                addressee.getId(),
+                FriendshipStatus.PENDING.name(),
+                new Date(System.currentTimeMillis())
+        );
+    }
+
+    @Override
+    public void addFriend(UserEntity requester, UserEntity addressee) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
+        jdbcTemplate.update(
+                ADD_INVITATION_SQL,
+                requester.getId(),
+                addressee.getId(),
+                FriendshipStatus.ACCEPTED.name(),
+                new Date(System.currentTimeMillis())
+        );
+        jdbcTemplate.update(
+                ADD_INVITATION_SQL,
+                addressee.getId(),
+                requester.getId(),
+                FriendshipStatus.ACCEPTED.name(),
+                new Date(System.currentTimeMillis())
+        );
+    }
+
+    @Override
+    public void remove(UserEntity user) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "DELETE FROM \"user\" WHERE id = ?"
         )) {
@@ -178,40 +238,6 @@ public class UserdataUserRepositorySpring implements UserdataUserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void addIncomeInvitation(UserEntity requester, UserEntity addressee) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(ADD_INVITATION_SQL);
-            ps.setObject(1, requester.getId());
-            ps.setObject(2, addressee.getId());
-            ps.setString(3, FriendshipStatus.PENDING.name());
-            ps.setDate(4, new Date(System.currentTimeMillis()));
-            ps.execute();
-            return null;
-        });
-    }
-
-    @Override
-    public void addFriend(UserEntity requester, UserEntity addressee) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(ADD_INVITATION_SQL);
-            ps.setObject(1, requester.getId());
-            ps.setObject(2, addressee.getId());
-            ps.setString(3, FriendshipStatus.PENDING.name());
-            ps.setDate(4, new Date(System.currentTimeMillis()));
-            ps.execute();
-
-            ps.setObject(1, addressee.getId());
-            ps.setObject(2, requester.getId());
-            ps.setString(3, FriendshipStatus.PENDING.name());
-            ps.setDate(4, new Date(System.currentTimeMillis()));
-            ps.execute();
-            return null;
-        });
     }
 
     private RowMapper<FriendshipEntity> friendshipRequesterMapper(UserEntity user) throws SQLException {
