@@ -1,8 +1,9 @@
 package guru.qa.niffler.model.userdata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.auth.AuthUserJson;
+import guru.qa.niffler.model.TestData;
 
 import java.util.UUID;
 
@@ -14,31 +15,38 @@ public record UserJson(
         String surname,
         String fullname,
         byte[] photo,
-        byte[] photoSmall
+        byte[] photoSmall,
+        FriendshipStatus friendshipStatus,
+        @JsonIgnore
+        TestData testData
 ) {
-  public static UserJson fromAuthUserJson(AuthUserJson authUserJson) {
-      return new UserJson(
-              authUserJson.getId(),
-              authUserJson.getUsername(),
-              CurrencyValues.RUB,
-              null,
-              null,
-              null,
-              null,
-              null
-      );
-  }
+    public static UserJson fromEntity(UserEntity entity, FriendshipStatus friendshipStatus) {
+        return new UserJson(
+                entity.getId(),
+                entity.getUsername(),
+                entity.getCurrency(),
+                entity.getFirstname(),
+                entity.getSurname(),
+                entity.getFullname(),
+                entity.getPhoto(),
+                entity.getPhotoSmall(),
+                friendshipStatus,
+                null
+        );
+    }
 
-  public static UserJson fromEntity(UserEntity entity) {
-      return new UserJson(
-              entity.getId(),
-              entity.getUsername(),
-              entity.getCurrency(),
-              entity.getFirstname(),
-              entity.getSurname(),
-              entity.getFullname(),
-              entity.getPhoto(),
-              entity.getPhotoSmall()
-      );
-  }
+    public UserJson addTestData(TestData testData) {
+        return new UserJson(
+                id,
+                username,
+                currency,
+                firstname,
+                surname,
+                fullname,
+                photo,
+                photoSmall,
+                friendshipStatus,
+                testData
+        );
+    }
 }
