@@ -1,8 +1,7 @@
-package guru.qa.niffler.model;
+package guru.qa.niffler.model.userdata;
 
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.spend.SpendJson;
-import guru.qa.niffler.model.userdata.UserJson;
 
 import java.util.List;
 

@@ -8,12 +8,18 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 public class FriendsPage {
+    private final SelenideElement searchPeopleInput = $("input[aria-label='search']");
     private final SelenideElement friendsTableShowButton = $x("//h2[text()='Friends']");
     private final SelenideElement allPeopleTableShowButton = $x("//h2[text()='All people']");
     private final SelenideElement requestsToFriendTable = $("#requests");
     private final SelenideElement friendsTable = $("#friends");
     private final SelenideElement allPeopleTable = $("#all");
     private final SelenideElement noUserLabel = $x("//p[text()='There are no users yet']");
+
+    public FriendsPage searchPeople(String name) {
+        searchPeopleInput.shouldBe(visible).setValue(name).pressEnter();
+        return this;
+    }
 
     public FriendsPage clickOnFriendsTable() {
         friendsTableShowButton.click();

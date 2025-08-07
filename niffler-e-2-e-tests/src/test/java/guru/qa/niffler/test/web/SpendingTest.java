@@ -31,6 +31,7 @@ public class SpendingTest {
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .checkThatPageLoaded()
+                .findSpending(spend.description())
                 .editSpending(spend.description())
                 .setNewSpendingDescription(newDescription)
                 .save()
