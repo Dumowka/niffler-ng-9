@@ -3,7 +3,6 @@ package guru.qa.niffler.model.userdata;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.TestData;
 
 import java.util.UUID;
 

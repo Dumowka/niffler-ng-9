@@ -6,6 +6,7 @@ import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.spend.CategoryJson;
+import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.Test;
 
@@ -14,28 +15,27 @@ public class UserProfileTest {
 
     private static final Config CFG = Config.getInstance();
 
-    private static final String username = "duck";
-    private static final String password = "12345";
-
     @Test
-    void mainPageShouldBeDisplayedAfterSuccessLogin() {
+    @User
+    void mainPageShouldBeDisplayedAfterSuccessLogin(UserJson user) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage(username, password)
+                .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .goToUserProfilePage()
                 .checkThatPageLoaded();
     }
 
     @User(
-            username = username,
             categories = @Category(
                     archived = true
             )
     )
     @Test
-    void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) {
+    void archivedCategoryShouldPresentInCategoriesList(UserJson user) {
+        final CategoryJson category = user.testData().categories().getFirst();
+
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage(username, password)
+                .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .goToUserProfilePage()
                 .checkThatCategoryNonExist(category.name())
@@ -44,13 +44,14 @@ public class UserProfileTest {
     }
 
     @User(
-            username = username,
             categories = @Category()
     )
     @Test
-    void activeCategoryShouldPresentInCategoriesList(CategoryJson category) {
+    void activeCategoryShouldPresentInCategoriesList(UserJson user) {
+        final CategoryJson category = user.testData().categories().getFirst();
+
         Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage(username, password)
+                .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .goToUserProfilePage()
                 .checkThatCategoryExist(category.name());

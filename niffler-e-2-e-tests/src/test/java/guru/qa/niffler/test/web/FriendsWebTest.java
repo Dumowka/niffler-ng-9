@@ -25,6 +25,7 @@ public class FriendsWebTest {
                 .submit()
                 .checkThatPageLoaded()
                 .goToUserFriendsPage()
+                .searchPeople(friend.username())
                 .checkFriends(friend.username());
     }
 
@@ -51,6 +52,7 @@ public class FriendsWebTest {
                 .submit()
                 .checkThatPageLoaded()
                 .goToUserFriendsPage()
+                .searchPeople(income.username())
                 .checkIncomeInvitation(income.username());
     }
 
@@ -67,6 +69,7 @@ public class FriendsWebTest {
                 .checkThatPageLoaded()
                 .goToUserFriendsPage()
                 .clickOnAllPeopleTable()
+                .searchPeople(outcome.username())
                 .checkOutcomeInvitation(outcome.username());
     }
 }

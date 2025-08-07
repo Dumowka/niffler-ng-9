@@ -12,6 +12,7 @@ public class MainPage {
   @Getter
   private final Header header = new Header();
 
+  private final SelenideElement searchSpendingInput = $("input[aria-label='search']");
   private final SelenideElement spendingTable = $("#spendings");
   private final SelenideElement spendingChart = $("#chart");
   private final SelenideElement spendingLegend = $("#legend-container");
@@ -20,6 +21,11 @@ public class MainPage {
     spendingTable.should(visible);
     spendingChart.should(visible);
     spendingLegend.should(visible);
+    return this;
+  }
+
+  public MainPage findSpending(String spendingDescription) {
+    searchSpendingInput.shouldBe(visible).setValue(spendingDescription).pressEnter();
     return this;
   }
 
