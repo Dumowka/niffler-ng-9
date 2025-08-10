@@ -11,6 +11,8 @@ import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.mapper.AuthUserEntityRowMapper;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.tpl.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
     private static final Config CFG = Config.getInstance();
@@ -29,14 +32,14 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     private static final AuthUserDao AUTH_USER_DAO = new AuthUserDaoJdbc();
 
     @Override
-    public AuthUserEntity create(AuthUserEntity user) {
+    public @Nonnull AuthUserEntity create(AuthUserEntity user) {
         AuthUserEntity createdUser = AUTH_USER_DAO.createUser(user);
         AUTHORITY_DAO.createAuthority(user.getAuthorities().toArray(new AuthorityEntity[0]));
         return createdUser;
     }
 
     @Override
-    public AuthUserEntity update(AuthUserEntity user) {
+    public @Nonnull AuthUserEntity update(AuthUserEntity user) {
         try (PreparedStatement preparedStatement = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "UPDATE \"user\" SET username = ?, password = ?, enabled = ?, account_non_expired = ?, " +
                         "account_non_locked = ?, credentials_non_expired = ? WHERE id = ?"
@@ -57,7 +60,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
 
     @Override
-    public Optional<AuthUserEntity> findById(UUID id) {
+    public @Nonnull Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT u.id AS id, u.username, u.password, u.enabled, u.account_non_expired, u.account_non_locked, " +
                         "u.credentials_non_expired, a.id AS authority_id, a.authority FROM \"user\" u " +
@@ -102,7 +105,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
 
     @Override
-    public Optional<AuthUserEntity> findByUsername(String username) {
+    public @Nonnull Optional<AuthUserEntity> findByUsername(String username) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT u.id AS id, u.username, u.password, u.enabled, u.account_non_expired, u.account_non_locked, " +
                         "u.credentials_non_expired, a.id AS authority_id, a.authority FROM \"user\" u " +
@@ -147,7 +150,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
 
     @Override
-    public List<AuthUserEntity> findAll() {
+    public @Nonnull List<AuthUserEntity> findAll() {
         try (PreparedStatement preparedStatement = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\""
         )) {

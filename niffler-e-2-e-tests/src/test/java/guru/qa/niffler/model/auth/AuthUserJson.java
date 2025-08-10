@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@ParametersAreNonnullByDefault
 public class AuthUserJson {
     private UUID id;
     private String username;
@@ -26,7 +29,7 @@ public class AuthUserJson {
     private Boolean credentialsNonExpired;
     private List<AuthorityJson> authorities = new ArrayList<>();
 
-    public static AuthUserJson fromEntity(AuthUserEntity entity) {
+    public static @Nonnull AuthUserJson fromEntity(AuthUserEntity entity) {
         AuthUserJson authUserJson = new AuthUserJson();
         authUserJson.setId(entity.getId());
         authUserJson.setUsername(entity.getUsername());

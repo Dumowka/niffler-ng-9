@@ -1,30 +1,71 @@
 package guru.qa.niffler.page.component;
 
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.page.EditSpendingPage;
 import guru.qa.niffler.page.FriendsPage;
+import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.page.PeoplePage;
 import guru.qa.niffler.page.UserProfilePage;
+import io.qameta.allure.Step;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$x;
 
+@ParametersAreNonnullByDefault
 public class Header {
     private final SelenideElement self = $("#root header");
-    private final SelenideElement menuButton = $("button[aria-label='Menu']");
-    private final SelenideElement profileLink = $("a[href='/profile']");
-    private final SelenideElement friendsLink = $x("//a[@href='/people/friends' and text()='Friends']");
 
-    public Header openMenu() {
-        self.$("button[aria-controls='account-menu']").click();
+    private final HeaderMenu headerMenu = new HeaderMenu();
+
+    @Step("Проверка заголовка на наличие текста 'Niffler'")
+    public Header checkHeaderText() {
+        self.$("h1.MuiTypography-root").shouldBe(visible).shouldHave(text("Niffler"));
         return this;
     }
 
-    public UserProfilePage clickOnProfileButton() {
-        self.$("a[href='/profile']").click();
-        return new UserProfilePage();
+    @Step("Раскрытие меню пользователя")
+    public Header openMenu() {
+        self.shouldBe(visible).$("[data-testid='PersonIcon']").click();
+        return this;
     }
 
-    public FriendsPage clickOnFriendsButton() {
-        self.$("a[href='/people/friends']").click();
-        return new FriendsPage();
+    @Step("Переход на страницу 'Profile'")
+    public UserProfilePage toProfilePage() {
+        openMenu();
+        return headerMenu.clickOnProfileButton();
+    }
+
+    @Step("Переход на страницу 'Friends'")
+    public FriendsPage toFriendsPage() {
+        openMenu();
+        return headerMenu.clickOnFriendsButton();
+    }
+
+    @Step("Переход на страницу 'All people'")
+    public PeoplePage toAllPeoplePage() {
+        openMenu();
+        return headerMenu.clickOnAllPeopleButton();
+    }
+
+    @Step("Выход из системы")
+    public LoginPage signOut() {
+        openMenu();
+        return headerMenu.clickOnSignOutButton();
+    }
+
+    @Step("Переход на страницу 'Add new spending'")
+    public EditSpendingPage addSpendingPage() {
+        self.$("a[href='/spending']").shouldBe(visible).click();
+        return new EditSpendingPage();
+    }
+
+    @Step("Переход на главную страницу")
+    public MainPage toMainPage() {
+        self.$("[alt='Niffler logo']").shouldBe(visible).click();
+        return new MainPage();
     }
 }

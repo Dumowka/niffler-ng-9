@@ -5,10 +5,14 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
+import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.spend.SpendJson;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
+
+import java.util.Date;
 
 @WebTest
 public class SpendingTest {
@@ -34,7 +38,26 @@ public class SpendingTest {
                 .findSpending(spend.description())
                 .editSpending(spend.description())
                 .setNewSpendingDescription(newDescription)
-                .save()
+                .saveEditedSpending()
+                .checkThatTableContainsSpending(newDescription);
+    }
+
+    @User
+    @Test
+    void addNewSpending(UserJson user) {
+        String newDescription = RandomDataUtils.randomSentence(2);
+
+        Selenide.open(CFG.frontUrl(), LoginPage.class)
+                .fillLoginPage(user.username(), user.testData().password())
+                .submit()
+                .checkThatPageLoaded()
+                .getHeader().addSpendingPage()
+                .setNewSpendingAmount(1000)
+                .setNewSpendingCurrency(CurrencyValues.KZT)
+                .setNewSpendingCategory(RandomDataUtils.randomCategoryName())
+                .selectDateInCalendar(new Date(2024, 11, 15))
+                .setNewSpendingDescription(newDescription)
+                .saveCreatedSpending()
                 .checkThatTableContainsSpending(newDescription);
     }
 }

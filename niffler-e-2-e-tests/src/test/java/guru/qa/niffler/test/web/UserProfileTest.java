@@ -8,6 +8,7 @@ import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
 
 @WebTest
@@ -21,7 +22,7 @@ public class UserProfileTest {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
-                .goToUserProfilePage()
+                .getHeader().toProfilePage()
                 .checkThatPageLoaded();
     }
 
@@ -37,7 +38,7 @@ public class UserProfileTest {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
-                .goToUserProfilePage()
+                .getHeader().toProfilePage()
                 .checkThatCategoryNonExist(category.name())
                 .clickOnShowArchivedCheckbox(true)
                 .checkThatCategoryExist(category.name());
@@ -53,7 +54,24 @@ public class UserProfileTest {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
-                .goToUserProfilePage()
+                .getHeader().toProfilePage()
                 .checkThatCategoryExist(category.name());
+    }
+
+    @User
+    @Test
+    void editProfile(UserJson user) {
+        String newName = RandomDataUtils.randomName();
+
+        Selenide.open(CFG.frontUrl(), LoginPage.class)
+                .fillLoginPage(user.username(), user.testData().password())
+                .submit()
+                .getHeader().toProfilePage()
+                .setName(newName)
+                .clickOnSubmitButton()
+                .checkName(newName)
+                .getHeader().toMainPage()
+                .getHeader().toProfilePage()
+                .checkName(newName);
     }
 }

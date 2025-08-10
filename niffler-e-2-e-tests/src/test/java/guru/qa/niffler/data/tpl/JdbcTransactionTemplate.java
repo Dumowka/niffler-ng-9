@@ -49,7 +49,7 @@ public class JdbcTransactionTemplate {
         }
     }
 
-    public <T> T execute(Supplier<T> action) {
+    public @Nullable <T> T execute(Supplier<T> action) {
         return execute(action, Connection.TRANSACTION_READ_COMMITTED);
     }
 }

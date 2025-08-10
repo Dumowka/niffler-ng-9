@@ -5,9 +5,12 @@ import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Date;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public record SpendJson(
     @JsonProperty("id")
     UUID id,
@@ -24,7 +27,7 @@ public record SpendJson(
     @JsonProperty("username")
     String username) {
 
-    public static SpendJson fromEntity(SpendEntity entity) {
+    public static @Nonnull SpendJson fromEntity(SpendEntity entity) {
         final CategoryEntity category = entity.getCategory();
         final String username = entity.getUsername();
 

@@ -24,7 +24,7 @@ public class FriendsWebTest {
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .checkThatPageLoaded()
-                .goToUserFriendsPage()
+                .getHeader().toFriendsPage()
                 .searchPeople(friend.username())
                 .checkFriends(friend.username());
     }
@@ -36,7 +36,7 @@ public class FriendsWebTest {
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .checkThatPageLoaded()
-                .goToUserFriendsPage()
+                .getHeader().toFriendsPage()
                 .checkNoFriend();
     }
 
@@ -51,9 +51,43 @@ public class FriendsWebTest {
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .checkThatPageLoaded()
-                .goToUserFriendsPage()
+                .getHeader().toFriendsPage()
                 .searchPeople(income.username())
                 .checkIncomeInvitation(income.username());
+    }
+
+    @Test
+    @User(
+            incomeInvitations = 1
+    )
+    void acceptIncomeInvitationInFriendsTable(UserJson user) {
+        UserJson income = user.testData().incomeInvitations().getFirst();
+
+        Selenide.open(CFG.frontUrl(), LoginPage.class)
+                .fillLoginPage(user.username(), user.testData().password())
+                .submit()
+                .checkThatPageLoaded()
+                .getHeader().toFriendsPage()
+                .searchPeople(income.username())
+                .acceptIncomeInvitation(income.username())
+                .checkFriends(income.username());
+    }
+
+    @Test
+    @User(
+            incomeInvitations = 1
+    )
+    void declineIncomeInvitationInFriendsTable(UserJson user) {
+        UserJson income = user.testData().incomeInvitations().getFirst();
+
+        Selenide.open(CFG.frontUrl(), LoginPage.class)
+                .fillLoginPage(user.username(), user.testData().password())
+                .submit()
+                .checkThatPageLoaded()
+                .getHeader().toFriendsPage()
+                .searchPeople(income.username())
+                .declineIncomeInvitation(income.username())
+                .checkNoFriend();
     }
 
     @Test
@@ -67,7 +101,7 @@ public class FriendsWebTest {
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .checkThatPageLoaded()
-                .goToUserFriendsPage()
+                .getHeader().toFriendsPage()
                 .clickOnAllPeopleTable()
                 .searchPeople(outcome.username())
                 .checkOutcomeInvitation(outcome.username());
