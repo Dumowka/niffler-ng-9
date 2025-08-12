@@ -11,7 +11,7 @@ import static com.codeborne.selenide.Selenide.$;
 import static guru.qa.niffler.model.ErrorMessages.BAD_CREDENTIALS;
 
 @ParametersAreNonnullByDefault
-public class LoginPage {
+public class LoginPage extends BasePage<LoginPage> {
   private final SelenideElement usernameInput = $("input[name='username']");
   private final SelenideElement passwordInput = $("input[name='password']");
   private final SelenideElement submitButton = $("button[type='submit']");
@@ -37,6 +37,7 @@ public class LoginPage {
     return new RegisterPage();
   }
 
+  @Override
   @Step("Проверка, что страница логина загружена")
   public LoginPage checkThatPageLoaded() {
     usernameInput.shouldBe(visible);

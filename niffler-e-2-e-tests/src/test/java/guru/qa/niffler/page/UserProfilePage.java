@@ -2,7 +2,6 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
-import guru.qa.niffler.page.component.AlertWindow;
 import guru.qa.niffler.page.component.Header;
 import io.qameta.allure.Step;
 import lombok.Getter;
@@ -16,7 +15,7 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
-public class UserProfilePage {
+public class UserProfilePage extends BasePage<UserProfilePage> {
 
     private final SelenideElement uploadNewPictureButton = $("label[for='image__input']");
     private final SelenideElement usernameInput = $("input[name='username']");
@@ -26,9 +25,9 @@ public class UserProfilePage {
 
     @Getter
     private final Header header = new Header();
-    private final AlertWindow alertWindow = new AlertWindow();
 
-    @Step("Проверка, что страница профиля пользователя загружена")
+    @Override
+    @Step("Проверка, что страница 'Profile' загружена")
     public UserProfilePage checkThatPageLoaded() {
         uploadNewPictureButton.shouldBe(Condition.visible);
         usernameInput.shouldBe(Condition.visible);
@@ -66,7 +65,7 @@ public class UserProfilePage {
     @Step("Нажатие на кнопку 'Save changes'")
     public UserProfilePage clickOnSubmitButton() {
         submitButton.click();
-        alertWindow.profileSuccesfullyUpdatedIsAppeared();
+        checkAlert("Profile successfully updated");
         return this;
     }
 

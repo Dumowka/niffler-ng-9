@@ -1,6 +1,5 @@
 package guru.qa.niffler.page.component;
 
-import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 
@@ -16,8 +15,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class Calendar {
-    private final SelenideElement self = $("div.MuiDateCalendar-root");
+public class Calendar extends BaseComponent<Calendar> {
 
     private final By yearAndMonthLabel = By.cssSelector("div.MuiPickersCalendarHeader-label");
     private final By previousMonthButton = By.cssSelector("[data-testid='ArrowLeftIcon']");
@@ -26,6 +24,10 @@ public class Calendar {
 
     private final DateTimeFormatter headerFmt =
             DateTimeFormatter.ofPattern("MMMM yyyy", new Locale("en"));
+
+    public Calendar() {
+        super($("div.MuiDateCalendar-root"));
+    }
 
     @Step("Выбор даты в календаре: {date}")
     public void selectDateInCalendar(
@@ -41,8 +43,8 @@ public class Calendar {
     private void selectYear(int year) {
         YearMonth currentYM = currentYM();
         if (year != currentYM.getYear()) {
-            self.$(switchToYearViewButton).shouldBe(visible).click();
-            self.$x(String.format(".//button[contains(@class, 'MuiPickersYear-yearButton') and text()='%s']", year))
+            getSelf().$(switchToYearViewButton).shouldBe(visible).click();
+            getSelf().$x(String.format(".//button[contains(@class, 'MuiPickersYear-yearButton') and text()='%s']", year))
                     .scrollIntoCenter()
                     .shouldBe(visible)
                     .click();
@@ -63,23 +65,23 @@ public class Calendar {
         }
 
         YearMonth expectedYM = YearMonth.of(currentYM.getYear(), month);
-        self.$(yearAndMonthLabel).shouldHave(text(expectedYM.format(headerFmt)));
+        getSelf().$(yearAndMonthLabel).shouldHave(text(expectedYM.format(headerFmt)));
     }
 
     @Step("Выбор дня: {day}")
     private void selectDay(int day) {
-        self.$x(String.format(".//button[contains(@class, 'MuiPickersDay-dayWithMargin') and text()='%s']", day))
+        getSelf().$x(String.format(".//button[contains(@class, 'MuiPickersDay-dayWithMargin') and text()='%s']", day))
                 .shouldBe(visible)
                 .click();
     }
 
     private void changeMonth(int steps, By button) {
         for (int i = 0; i < steps; i++) {
-            self.$(button).shouldBe(visible).click();
+            getSelf().$(button).shouldBe(visible).click();
         }
     }
 
     private YearMonth currentYM() {
-        return YearMonth.parse(self.$(yearAndMonthLabel).shouldBe(visible).getText(), headerFmt);
+        return YearMonth.parse(getSelf().$(yearAndMonthLabel).shouldBe(visible).getText(), headerFmt);
     }
 }

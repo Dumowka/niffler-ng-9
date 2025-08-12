@@ -13,20 +13,23 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class SpendingTable {
-    private final SelenideElement self = $("#spendings");
+public class SpendingTable extends BaseComponent<SpendingTable> {
 
     private final SearchField searchField = new SearchField();
 
+    public SpendingTable() {
+        super($("#spendings"));
+    }
+
     @Step("Проверка, что таблица затрат загружена")
     public SpendingTable checkIsLoaded() {
-        self.shouldBe(visible);
+        getSelf().shouldBe(visible);
         return this;
     }
 
     @Step("Выбор периода: {period}")
     public SpendingTable selectPeriod(@Nonnull DataFilterValues period) {
-        self.$("#period").shouldBe(visible).click();
+        getSelf().$("#period").shouldBe(visible).click();
         $(String.format("li[data-value='%s']", period.name())).shouldBe(visible).click();
         return this;
     }
@@ -40,7 +43,7 @@ public class SpendingTable {
     @Step("Удаление затраты с описанием: {description}")
     public SpendingTable deleteSpending(@Nonnull String description) {
         getRowInTable(description).shouldBe(visible).click();
-        self.$("#delete").shouldBe(visible).click();
+        getSelf().$("#delete").shouldBe(visible).click();
         return this;
     }
 
@@ -66,10 +69,10 @@ public class SpendingTable {
     }
 
     private SelenideElement getRowInTable(String rowName) {
-        return self.$x(String.format(".//span[text()='%s']//ancestor::tr", rowName));
+        return getSelf().$x(String.format(".//span[text()='%s']//ancestor::tr", rowName));
     }
 
     private ElementsCollection getRowsTable() {
-        return self.$$("tbody tr");
+        return getSelf().$$("tbody tr");
     }
 }

@@ -13,7 +13,7 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
-public class RegisterPage {
+public class RegisterPage extends BasePage<RegisterPage> {
     private final SelenideElement alreadyHaveAnAccountLoginLink= $("a[href='/login']");
     private final SelenideElement usernameInput = $("input[name='username']");
     private final SelenideElement passwordInput = $("input[name='password']");
@@ -31,6 +31,7 @@ public class RegisterPage {
         return new LoginPage();
     }
 
+    @Override
     @Step("Проверка, что страница регистрации загружена")
     public RegisterPage checkThatPageLoaded() {
         alreadyHaveAnAccountLoginLink.shouldBe(visible);
