@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public record UserJson(
         UUID id,
         String username,
@@ -15,11 +19,11 @@ public record UserJson(
         String fullname,
         byte[] photo,
         byte[] photoSmall,
-        FriendshipStatus friendshipStatus,
+        @Nullable FriendshipStatus friendshipStatus,
         @JsonIgnore
-        TestData testData
+        @Nullable TestData testData
 ) {
-    public static UserJson fromEntity(UserEntity entity, FriendshipStatus friendshipStatus) {
+    public static @Nonnull UserJson fromEntity(UserEntity entity, @Nullable FriendshipStatus friendshipStatus) {
         return new UserJson(
                 entity.getId(),
                 entity.getUsername(),
@@ -34,7 +38,7 @@ public record UserJson(
         );
     }
 
-    public UserJson addTestData(TestData testData) {
+    public @Nonnull UserJson addTestData(TestData testData) {
         return new UserJson(
                 id,
                 username,

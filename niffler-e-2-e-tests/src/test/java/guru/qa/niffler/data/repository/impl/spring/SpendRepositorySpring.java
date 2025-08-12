@@ -9,18 +9,21 @@ import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.repository.SpendRepository;
 import jakarta.persistence.NoResultException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class SpendRepositorySpring implements SpendRepository {
 
     private static final SpendDao SPEND_DAO = new SpendDaoSpringJdbc();
     private static final CategoryDao CATEGORY_DAO = new CategoryDaoSpringJdbc();
 
     @Override
-    public SpendEntity create(SpendEntity spend) {
+    public @Nonnull SpendEntity create(SpendEntity spend) {
         if (spend.getCategory().getId() == null || CATEGORY_DAO.findCategoryById(spend.getCategory().getId()).isEmpty()) {
             CategoryEntity categoryEntity = CATEGORY_DAO.create(spend.getCategory());
             spend.setCategory(categoryEntity);
@@ -29,25 +32,25 @@ public class SpendRepositorySpring implements SpendRepository {
     }
 
     @Override
-    public SpendEntity update(SpendEntity spend) {
+    public @Nonnull SpendEntity update(SpendEntity spend) {
         SPEND_DAO.update(spend);
         CATEGORY_DAO.update(spend.getCategory());
         return spend;
     }
 
     @Override
-    public CategoryEntity createCategory(CategoryEntity category) {
+    public @Nonnull CategoryEntity createCategory(CategoryEntity category) {
         return CATEGORY_DAO.create(category);
     }
 
     @Override
-    public CategoryEntity updateCategory(CategoryEntity category) {
+    public @Nonnull CategoryEntity updateCategory(CategoryEntity category) {
         CATEGORY_DAO.update(category);
         return category;
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryById(UUID id) {
+    public @Nonnull Optional<CategoryEntity> findCategoryById(UUID id) {
         try {
             return CATEGORY_DAO.findCategoryById(id);
         } catch (NoResultException e) {
@@ -56,7 +59,7 @@ public class SpendRepositorySpring implements SpendRepository {
     }
 
     @Override
-    public Optional<CategoryEntity> findCategoryByUsernameAndName(String username, String name) {
+    public @Nonnull Optional<CategoryEntity> findCategoryByUsernameAndName(String username, String name) {
         try {
             return CATEGORY_DAO.findCategoryByUsernameAndCategoryName(username, name);
         } catch (NoResultException e) {
@@ -65,7 +68,7 @@ public class SpendRepositorySpring implements SpendRepository {
     }
 
     @Override
-    public Optional<SpendEntity> findById(UUID id) {
+    public @Nonnull Optional<SpendEntity> findById(UUID id) {
         Optional<SpendEntity> spendEntity = SPEND_DAO.findSpendById(id);
         if (spendEntity.isPresent()) {
             UUID categoryId = spendEntity
@@ -78,7 +81,7 @@ public class SpendRepositorySpring implements SpendRepository {
     }
 
     @Override
-    public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
+    public @Nonnull Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
         Optional<SpendEntity> spendEntity = SPEND_DAO.findByUsernameAndSpendDescription(username, description);
         if (spendEntity.isPresent()) {
             UUID categoryId = spendEntity

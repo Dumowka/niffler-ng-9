@@ -9,18 +9,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
 
   private static final Config CFG = Config.getInstance();
 
   @Override
-  public UserEntity createUser(UserEntity user) {
+  public @Nonnull UserEntity createUser(UserEntity user) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
     KeyHolder kh = new GeneratedKeyHolder();
     jdbcTemplate.update(con -> {
@@ -45,7 +48,7 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
   }
 
   @Override
-  public Optional<UserEntity> findUserById(UUID id) {
+  public @Nonnull Optional<UserEntity> findUserById(UUID id) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
     return Optional.ofNullable(
         jdbcTemplate.queryForObject(
@@ -57,7 +60,7 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
   }
 
   @Override
-  public Optional<UserEntity> findUserByUsername(String username) {
+  public @Nonnull Optional<UserEntity> findUserByUsername(String username) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
     return Optional.ofNullable(
             jdbcTemplate.queryForObject(
@@ -69,7 +72,7 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
   }
 
   @Override
-  public List<UserEntity> findAll() {
+  public @Nonnull List<UserEntity> findAll() {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
     return jdbcTemplate.query(
             "SELECT * FROM \"user\"",

@@ -6,12 +6,15 @@ import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
 import jakarta.persistence.EntityManager;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static guru.qa.niffler.data.jpa.EntityManagers.em;
 
+@ParametersAreNonnullByDefault
 public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
 
     private static final Config CFG = Config.getInstance();
@@ -19,20 +22,20 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
     private final EntityManager entityManager = em(CFG.userdataJdbcUrl());
 
     @Override
-    public UserEntity create(UserEntity userEntity) {
+    public @Nonnull UserEntity create(UserEntity userEntity) {
         entityManager.joinTransaction();
         entityManager.persist(userEntity);
         return userEntity;
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID id) {
+    public @Nonnull Optional<UserEntity> findById(UUID id) {
         UserEntity entity = entityManager.find(UserEntity.class, id);
         return entity == null ? Optional.empty() : Optional.of(entity);
     }
 
     @Override
-    public Optional<UserEntity> findByUsername(String username) {
+    public @Nonnull Optional<UserEntity> findByUsername(String username) {
         UserEntity entity = entityManager.createQuery("SELECT u FROM UserEntity u WHERE u.username =: username", UserEntity.class)
                 .setParameter("username", username)
                 .getSingleResult();
@@ -40,12 +43,12 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
     }
 
     @Override
-    public List<UserEntity> findAll() {
+    public @Nonnull List<UserEntity> findAll() {
         return entityManager.createQuery("SELECT u FROM UserEntity u", UserEntity.class).getResultList();
     }
 
     @Override
-    public UserEntity update(UserEntity user) {
+    public @Nonnull UserEntity update(UserEntity user) {
         entityManager.joinTransaction();
         entityManager.merge(user);
         return user;

@@ -15,9 +15,12 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.metamodel.Metamodel;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
+@ParametersAreNonnullByDefault
 public class ThreadSageEntityManager implements EntityManager {
     
     private final ThreadLocal<EntityManager> threadEm = new ThreadLocal<>();
@@ -28,7 +31,7 @@ public class ThreadSageEntityManager implements EntityManager {
         emf = delegate.getEntityManagerFactory();
     }
     
-    private EntityManager threadEm() {
+    private @Nonnull EntityManager threadEm() {
         if (threadEm.get() == null || !threadEm.get().isOpen()) {
             threadEm.set(emf.createEntityManager());
         }

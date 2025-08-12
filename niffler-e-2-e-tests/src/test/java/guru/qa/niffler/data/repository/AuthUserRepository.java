@@ -2,20 +2,23 @@ package guru.qa.niffler.data.repository;
 
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface AuthUserRepository {
-    AuthUserEntity create(AuthUserEntity user);
+    @Nonnull AuthUserEntity create(AuthUserEntity user);
 
-    AuthUserEntity update(AuthUserEntity user);
+    @Nonnull AuthUserEntity update(AuthUserEntity user);
 
-    Optional<AuthUserEntity> findById(UUID id);
+    @Nonnull Optional<AuthUserEntity> findById(UUID id);
 
-    Optional<AuthUserEntity> findByUsername(String username);
+    @Nonnull Optional<AuthUserEntity> findByUsername(String username);
 
-    List<AuthUserEntity> findAll();
+    @Nonnull List<AuthUserEntity> findAll();
 
     void remove(AuthUserEntity user);
 }

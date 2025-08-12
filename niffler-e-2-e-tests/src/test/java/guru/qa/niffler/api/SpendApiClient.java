@@ -5,6 +5,7 @@ import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.spend.SpendJson;
 import guru.qa.niffler.service.SpendClient;
+import io.qameta.allure.Step;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -34,6 +35,7 @@ public class SpendApiClient implements SpendClient {
     private final SpendApi spendApi = retrofit.create(SpendApi.class);
 
     @Override
+    @Step("Создание расхода через API: {spend.description}")
     public @Nullable SpendJson create(SpendJson spend) {
         final Response<SpendJson> response;
         try {
@@ -46,6 +48,7 @@ public class SpendApiClient implements SpendClient {
     }
 
     @Override
+    @Step("Обновление расхода через API: {spend.description}")
     public @Nullable SpendJson update(SpendJson spend) {
         final Response<SpendJson> response;
         try {
@@ -58,6 +61,7 @@ public class SpendApiClient implements SpendClient {
     }
 
     @Override
+    @Step("Создание категории через API: {category.name}")
     public @Nullable CategoryJson createCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
@@ -70,6 +74,7 @@ public class SpendApiClient implements SpendClient {
     }
 
     @Override
+    @Step("Обновление категории через API: {category.name}")
     public @Nullable CategoryJson updateCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
@@ -82,26 +87,31 @@ public class SpendApiClient implements SpendClient {
     }
 
     @Override
+    @Step("Поиск категории по ID через API: {id}")
     public @Nonnull Optional<CategoryJson> findCategoryById(UUID id) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
+    @Step("Поиск категории по имени пользователя {username} и названию {spendName} через API")
     public @Nonnull Optional<CategoryJson> findCategoryByUsernameAndName(String username, String spendName) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
+    @Step("Поиск расхода по ID через API: {id}")
     public @Nonnull Optional<SpendJson> findById(UUID id) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
+    @Step("Поиск расхода по имени пользователя {username} и описанию {spendDescription} через API")
     public @Nonnull Optional<SpendJson> findByUsernameAndSpendDescription(String username, String spendDescription) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
+    @Step("Удаление расхода через API: {spend.description}")
     public void remove(SpendJson spend) {
         final Response<Void> response;
         try {
@@ -113,10 +123,12 @@ public class SpendApiClient implements SpendClient {
     }
 
     @Override
+    @Step("Удаление категории через API: {category.name}")
     public void removeCategory(CategoryJson category) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Step("Получение расхода через API (по объекту): {spendJson.description}")
     public @Nullable SpendJson getSpend(SpendJson spendJson) {
         final Response<SpendJson> response;
         try {
@@ -128,7 +140,8 @@ public class SpendApiClient implements SpendClient {
         return response.body();
     }
 
-    public @Nullable SpendJson getSpend(String id, String username) {
+    @Step("Поиск расхода через API (по ID: {id}, username: {username})")
+    public @Nullable SpendJson findSpend(String id, String username) {
         final Response<SpendJson> response;
         try {
             response = spendApi.getSpend(id, username).execute();
@@ -139,7 +152,8 @@ public class SpendApiClient implements SpendClient {
         return response.body();
     }
 
-    public @Nonnull List<SpendJson> getSpends(
+    @Step("Поиск расходов через API для пользователя {username} с фильтром: валюта={filterCurrency}, от={from}, до={to}")
+    public @Nonnull List<SpendJson> findSpends(
             String username,
             @Nullable CurrencyValues filterCurrency,
             @Nullable Date from,
@@ -157,7 +171,8 @@ public class SpendApiClient implements SpendClient {
                 : Collections.emptyList();
     }
 
-    public @Nonnull List<CategoryJson> getCategories(String username, boolean excludeArchived) {
+    @Step("Поиск списка категорий через API для пользователя {username}, исключить архивные: {excludeArchived}")
+    public @Nonnull List<CategoryJson> findCategories(String username, boolean excludeArchived) {
         final Response<List<CategoryJson>> response;
         try {
             response = spendApi.getCategories(username, excludeArchived).execute();

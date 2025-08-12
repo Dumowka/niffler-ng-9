@@ -3,34 +3,38 @@ package guru.qa.niffler.service;
 import guru.qa.niffler.model.auth.AuthUserJson;
 import guru.qa.niffler.model.userdata.UserJson;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface UsersClient {
-    UserJson createUser(String username, String password);
+    @Nullable UserJson createUser(String username, String password);
 
-    AuthUserJson update(AuthUserJson authUserJson);
+    @Nullable AuthUserJson update(AuthUserJson authUserJson);
 
-    Optional<AuthUserJson> getAuthUserById(UUID id);
+    @Nonnull Optional<AuthUserJson> getAuthUserById(UUID id);
 
-    Optional<AuthUserJson> getAuthUserByName(String username);
+    @Nonnull Optional<AuthUserJson> getAuthUserByName(String username);
 
-    List<AuthUserJson> findAll();
+    @Nonnull List<AuthUserJson> findAll();
 
-    UserJson update(UserJson userJson);
+    @Nullable UserJson update(UserJson userJson);
 
-    Optional<UserJson> getUserById(UUID id);
+    @Nonnull Optional<UserJson> getUserById(UUID id);
 
-    Optional<UserJson> getUserByName(String username);
+    @Nonnull Optional<UserJson> getUserByName(String username);
 
-    List<UserJson> addIncomeInvitation(UserJson targetUser, int count);
+    @Nonnull List<UserJson> addIncomeInvitation(UserJson targetUser, int count);
 
-    List<UserJson> addOutcomeInvitation(UserJson targetUser, int count);
+    @Nonnull List<UserJson> addOutcomeInvitation(UserJson targetUser, int count);
 
     void removeUser(AuthUserJson authUserJson);
 
-    List<UserJson> addFriend(UserJson targetUser, int count);
+    @Nonnull List<UserJson> addFriend(UserJson targetUser, int count);
 
     void addFriend(UserJson requester, UserJson addressee);
 }
