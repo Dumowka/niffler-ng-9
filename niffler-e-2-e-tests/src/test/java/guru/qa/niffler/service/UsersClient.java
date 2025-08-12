@@ -2,6 +2,7 @@ package guru.qa.niffler.service;
 
 import guru.qa.niffler.model.auth.AuthUserJson;
 import guru.qa.niffler.model.userdata.UserJson;
+import guru.qa.niffler.service.impl.UsersDbClient;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,6 +13,11 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 public interface UsersClient {
+    @Nonnull
+    static UsersClient getInstanse() {
+        return new UsersDbClient();
+    }
+
     @Nullable UserJson createUser(String username, String password);
 
     @Nullable AuthUserJson update(AuthUserJson authUserJson);

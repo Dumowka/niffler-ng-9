@@ -1,28 +1,32 @@
 package guru.qa.niffler.test;
 
+import guru.qa.niffler.jupiter.extension.ClientResolver;
 import guru.qa.niffler.model.auth.AuthUserJson;
 import guru.qa.niffler.model.userdata.UserJson;
-import guru.qa.niffler.service.impl.UsersDbClient;
+import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@ExtendWith(ClientResolver.class)
 public class UserDbTest {
-    private final UsersDbClient usersDbClient = new UsersDbClient();
 
-    private static String name = "a21";
+    private UsersClient usersClient;
+
+    private static String name = "a24";
 
     @Test
     void checkCreatingUser() {
-        UserJson user = usersDbClient.createUser(name, "12345");
+        UserJson user = usersClient.createUser(name, "12345");
         System.out.println(user);
     }
 
     @Test
     void checkAuthUserFindByNameAndUpdateUser() {
-        AuthUserJson authUserJson = usersDbClient.getAuthUserByName(name).get();
+        AuthUserJson authUserJson = usersClient.getAuthUserByName(name).get();
         AuthUserJson updatedUserJson = new AuthUserJson(
                 authUserJson.getId(),
                 authUserJson.getUsername(),
@@ -33,26 +37,26 @@ public class UserDbTest {
                 authUserJson.getCredentialsNonExpired(),
                 authUserJson.getAuthorities()
         );
-        AuthUserJson receivedUser = usersDbClient.update(updatedUserJson);
+        AuthUserJson receivedUser = usersClient.update(updatedUserJson);
         assertEquals(updatedUserJson, receivedUser);
     }
 
     @Test
     void checkFindAuthUserById() {
-        AuthUserJson userByName = usersDbClient.getAuthUserByName(name).get();
-        AuthUserJson userById = usersDbClient.getAuthUserById(userByName.getId()).get();
+        AuthUserJson userByName = usersClient.getAuthUserByName(name).get();
+        AuthUserJson userById = usersClient.getAuthUserById(userByName.getId()).get();
         assertEquals(userByName, userById);
     }
 
     @Test
     void checkFindAllAuthUser() {
-        assertFalse(usersDbClient.findAll().isEmpty());
+        assertFalse(usersClient.findAll().isEmpty());
     }
 
     @Test
     void checkUserdataFindByNameAndUpdate() {
         String newFirstName = RandomDataUtils.randomName();
-        UserJson user = usersDbClient.getUserByName(name).get();
+        UserJson user = usersClient.getUserByName(name).get();
         UserJson updatedUser = new UserJson(
                 user.id(),
                 user.username(),
@@ -65,40 +69,40 @@ public class UserDbTest {
                 null,
                 null
         );
-        UserJson receivedUser = usersDbClient.update(updatedUser);
+        UserJson receivedUser = usersClient.update(updatedUser);
         System.out.println(receivedUser);
         assertEquals(updatedUser, receivedUser);
     }
 
     @Test
     void checkUserDataFindById() {
-        UserJson userByName = usersDbClient.getUserByName(name).get();
-        UserJson userById = usersDbClient.getUserById(userByName.id()).get();
+        UserJson userByName = usersClient.getUserByName(name).get();
+        UserJson userById = usersClient.getUserById(userByName.id()).get();
         assertEquals(userByName, userById);
     }
 
     @Test
     void checkIncomeInvitation() {
-        UserJson requester = usersDbClient.createUser(RandomDataUtils.randomUsername(), "12345");
-        usersDbClient.addIncomeInvitation(requester, 1);
+        UserJson requester = usersClient.createUser(RandomDataUtils.randomUsername(), "12345");
+        usersClient.addIncomeInvitation(requester, 1);
     }
 
     @Test
     void checkOutcomeInvitation() {
-        UserJson requester = usersDbClient.createUser(RandomDataUtils.randomUsername(), "12345");
-        usersDbClient.addOutcomeInvitation(requester, 1);
+        UserJson requester = usersClient.createUser(RandomDataUtils.randomUsername(), "12345");
+        usersClient.addOutcomeInvitation(requester, 1);
     }
 
     @Test
     void checkAddFriend() {
-        UserJson requester = usersDbClient.createUser(RandomDataUtils.randomUsername(), "12345");
-        UserJson addressee = usersDbClient.createUser(RandomDataUtils.randomUsername(), "12345");
-        usersDbClient.addFriend(requester, addressee);
+        UserJson requester = usersClient.createUser(RandomDataUtils.randomUsername(), "12345");
+        UserJson addressee = usersClient.createUser(RandomDataUtils.randomUsername(), "12345");
+        usersClient.addFriend(requester, addressee);
     }
 
     @Test
     void removeUser() {
-        AuthUserJson userJson = usersDbClient.getAuthUserByName(name).get();
-        usersDbClient.removeUser(userJson);
+        AuthUserJson userJson = usersClient.getAuthUserByName(name).get();
+        usersClient.removeUser(userJson);
     }
 }

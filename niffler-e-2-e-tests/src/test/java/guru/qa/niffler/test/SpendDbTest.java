@@ -1,11 +1,13 @@
 package guru.qa.niffler.test;
 
+import guru.qa.niffler.jupiter.extension.ClientResolver;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.spend.SpendJson;
-import guru.qa.niffler.service.impl.SpendDbClient;
+import guru.qa.niffler.service.SpendClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Date;
 import java.util.Optional;
@@ -15,22 +17,24 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(ClientResolver.class)
 public class SpendDbTest {
-    private final SpendDbClient spendDbClient = new SpendDbClient();
+
+    private SpendClient spendClient;
 
     private String username = "test-2";
     private String description = "vitae omnis";
 
     @Test
     void checkCreateSend() {
-        SpendJson spendJson = spendDbClient.create(generateNewSpend());
+        SpendJson spendJson = spendClient.create(generateNewSpend());
         System.out.println(spendJson);
         assertNotNull(spendJson);
     }
 
     @Test
     void checkSpendFindByUsernameAndUpdate() {
-        SpendJson spendJson = spendDbClient.findByUsernameAndSpendDescription(username, description).get();
+        SpendJson spendJson = spendClient.findByUsernameAndSpendDescription(username, description).get();
 
         SpendJson updatedSpend = new SpendJson(
                 spendJson.id(),
@@ -41,37 +45,37 @@ public class SpendDbTest {
                 spendJson.description(),
                 spendJson.username()
         );
-        spendDbClient.update(updatedSpend);
-        SpendJson updateJson = spendDbClient.findByUsernameAndSpendDescription(username, description).get();
+        spendClient.update(updatedSpend);
+        SpendJson updateJson = spendClient.findByUsernameAndSpendDescription(username, description).get();
         assertSpends(updatedSpend, updateJson);
     }
 
     @Test
     void checkSpendFindById() {
-        SpendJson spendJson = spendDbClient.create(generateNewSpend());
-        SpendJson spendJsonById = spendDbClient.findById(spendJson.id()).get();
+        SpendJson spendJson = spendClient.create(generateNewSpend());
+        SpendJson spendJsonById = spendClient.findById(spendJson.id()).get();
         assertSpends(spendJson, spendJsonById);
     }
 
     // Падает тест при реализации Hibernate с ошибкой guru.qa.niffler.data.entity.spend.SpendEntity#a61ddd8f-38ea-4f8d-8e4b-cde0a15b5db6
     @Test
     void checkRemoveSpend() {
-        SpendJson spendJson = spendDbClient.create(generateNewSpend());
-        spendDbClient.remove(spendJson);
-        SpendJson afterRemoving = spendDbClient.findById(spendJson.id()).orElse(null);
+        SpendJson spendJson = spendClient.create(generateNewSpend());
+        spendClient.remove(spendJson);
+        SpendJson afterRemoving = spendClient.findById(spendJson.id()).orElse(null);
         assertNull(afterRemoving);
     }
 
     @Test
     void checkCategoryCreate() {
-        CategoryJson categoryJson = spendDbClient.createCategory(generateNewCategory());
+        CategoryJson categoryJson = spendClient.createCategory(generateNewCategory());
         assertNotNull(categoryJson);
         System.out.println(categoryJson);
     }
 
     @Test
     void checkCategoryFindByUsernameAndUpdate() {
-        CategoryJson categoryJson = spendDbClient.createCategory(generateNewCategory());
+        CategoryJson categoryJson = spendClient.createCategory(generateNewCategory());
         CategoryJson updatedCategory = new CategoryJson(
                 categoryJson.id(),
                 categoryJson.name(),
@@ -79,33 +83,33 @@ public class SpendDbTest {
                 !categoryJson.archived()
         );
 
-        CategoryJson receivedCategory = spendDbClient.updateCategory(updatedCategory);
+        CategoryJson receivedCategory = spendClient.updateCategory(updatedCategory);
         assertEquals(updatedCategory, receivedCategory);
     }
 
     @Test
     void checkCategoryFindById() {
-        CategoryJson categoryJson = spendDbClient.createCategory(generateNewCategory());
-        CategoryJson categoryById = spendDbClient.findCategoryById(categoryJson.id()).get();
+        CategoryJson categoryJson = spendClient.createCategory(generateNewCategory());
+        CategoryJson categoryById = spendClient.findCategoryById(categoryJson.id()).get();
         assertEquals(categoryJson, categoryById);
     }
 
     @Test
     void checkRemoveCategory() {
-        CategoryJson categoryJson = spendDbClient.createCategory(generateNewCategory());
-        spendDbClient.removeCategory(categoryJson);
-        CategoryJson categoryAfterRemoving = spendDbClient.findCategoryById(categoryJson.id()).orElse(null);
+        CategoryJson categoryJson = spendClient.createCategory(generateNewCategory());
+        spendClient.removeCategory(categoryJson);
+        CategoryJson categoryAfterRemoving = spendClient.findCategoryById(categoryJson.id()).orElse(null);
         assertNull(categoryAfterRemoving);
     }
 
     @Test
     void checkRemoveCategoryWithSpend() {
-        SpendJson createdSpend = spendDbClient.create(generateNewSpend());
-        spendDbClient.remove(createdSpend);
-        spendDbClient.removeCategory(createdSpend.category());
+        SpendJson createdSpend = spendClient.create(generateNewSpend());
+        spendClient.remove(createdSpend);
+        spendClient.removeCategory(createdSpend.category());
 
-        Optional<SpendJson> removedSpend = spendDbClient.findById(createdSpend.id());
-        Optional<CategoryJson> removedCategory = spendDbClient.findCategoryById(createdSpend.category().id());
+        Optional<SpendJson> removedSpend = spendClient.findById(createdSpend.id());
+        Optional<CategoryJson> removedCategory = spendClient.findCategoryById(createdSpend.category().id());
 
         assertTrue(removedSpend.isEmpty());
         assertTrue(removedCategory.isEmpty());
