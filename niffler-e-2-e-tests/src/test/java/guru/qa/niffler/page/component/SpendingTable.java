@@ -19,7 +19,7 @@ public class SpendingTable {
     private final SearchField searchField = new SearchField();
 
     @Step("Проверка, что таблица затрат загружена")
-    public SpendingTable isLoaded() {
+    public SpendingTable checkIsLoaded() {
         self.shouldBe(visible);
         return this;
     }

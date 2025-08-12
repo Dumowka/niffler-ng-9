@@ -37,7 +37,7 @@ public class SpendingTest {
                 .checkThatPageLoaded()
                 .findSpending(spend.description())
                 .editSpending(spend.description())
-                .setNewSpendingDescription(newDescription)
+                .setDescription(newDescription)
                 .saveEditedSpending()
                 .checkThatTableContainsSpending(newDescription);
     }
@@ -52,11 +52,11 @@ public class SpendingTest {
                 .submit()
                 .checkThatPageLoaded()
                 .getHeader().addSpendingPage()
-                .setNewSpendingAmount(1000)
-                .setNewSpendingCurrency(CurrencyValues.KZT)
-                .setNewSpendingCategory(RandomDataUtils.randomCategoryName())
+                .setAmount(1000)
+                .setCurrency(CurrencyValues.KZT)
+                .setCategory(RandomDataUtils.randomCategoryName())
                 .selectDateInCalendar(new Date(2024, 11, 15))
-                .setNewSpendingDescription(newDescription)
+                .setDescription(newDescription)
                 .saveCreatedSpending()
                 .checkThatTableContainsSpending(newDescription);
     }

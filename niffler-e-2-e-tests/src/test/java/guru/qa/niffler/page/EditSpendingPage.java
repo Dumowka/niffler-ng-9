@@ -29,26 +29,26 @@ public class EditSpendingPage {
   private final AlertWindow alertWindow = new AlertWindow();
 
   @Step("Изменение описания траты на: {description}")
-  public EditSpendingPage setNewSpendingDescription(String description) {
+  public EditSpendingPage setDescription(String description) {
     descriptionInput.setValue(description);
     return this;
   }
 
   @Step("Изменение суммы затрат на: {amount}")
-  public EditSpendingPage setNewSpendingAmount(int amount) {
+  public EditSpendingPage setAmount(int amount) {
     amountInput.setValue(String.valueOf(amount));
     return this;
   }
 
   @Step("Изменение валюты затрат на: {currency}")
-  public EditSpendingPage setNewSpendingCurrency(CurrencyValues currency) {
+  public EditSpendingPage setCurrency(CurrencyValues currency) {
     currencyInput.shouldBe(visible).click();
     $(String.format(currencyItemCss, currency.name())).shouldBe(visible).click();
     return this;
   }
 
   @Step("Изменение категории трат на: {categoryName}")
-  public EditSpendingPage setNewSpendingCategory(String categoryName) {
+  public EditSpendingPage setCategory(String categoryName) {
     categoryInput.shouldBe(visible).setValue(categoryName);
     return this;
   }

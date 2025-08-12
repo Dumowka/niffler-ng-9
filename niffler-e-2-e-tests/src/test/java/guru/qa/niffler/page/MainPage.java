@@ -28,7 +28,7 @@ public class MainPage {
 
   @Step("Проверка загрузки главной страницы")
   public MainPage checkThatPageLoaded() {
-    spendingTable.isLoaded();
+    spendingTable.checkIsLoaded();
     spendingChart.should(visible);
     spendingLegend.should(visible);
     header.checkHeaderText();
