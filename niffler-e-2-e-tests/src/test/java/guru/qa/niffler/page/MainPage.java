@@ -1,7 +1,6 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
-import guru.qa.niffler.page.component.AlertWindow;
 import guru.qa.niffler.page.component.DataFilterValues;
 import guru.qa.niffler.page.component.DeleteSpendingsDialogWindow;
 import guru.qa.niffler.page.component.Header;
@@ -16,7 +15,7 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class MainPage {
+public class MainPage extends BasePage<MainPage> {
   private final SelenideElement spendingChart = $("#chart");
   private final SelenideElement spendingLegend = $("#legend-container");
 
@@ -24,9 +23,9 @@ public class MainPage {
   private final Header header = new Header();
   private final SpendingTable spendingTable = new SpendingTable();
   private final DeleteSpendingsDialogWindow deleteSpendingsDialogWindow = new DeleteSpendingsDialogWindow();
-  private final AlertWindow alertWindow = new AlertWindow();
 
-  @Step("Проверка загрузки главной страницы")
+  @Override
+  @Step("Проверка, что главная страница загружена")
   public MainPage checkThatPageLoaded() {
     spendingTable.checkIsLoaded();
     spendingChart.should(visible);
@@ -56,7 +55,7 @@ public class MainPage {
   public MainPage removeSpending(@Nonnull String description) {
     spendingTable.deleteSpending(description);
     deleteSpendingsDialogWindow.checkThatWindowIsAppear().clickOnDeleteButton();
-    alertWindow.spendingsSuccesfullyDeletedIsAppeared();
+    checkAlert("Spendings succesfully deleted");
     return this;
   }
 

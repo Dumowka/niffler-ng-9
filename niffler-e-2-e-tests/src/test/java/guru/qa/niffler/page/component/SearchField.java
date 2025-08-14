@@ -1,6 +1,5 @@
 package guru.qa.niffler.page.component;
 
-import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 
@@ -13,22 +12,25 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
-public class SearchField {
-    private final SelenideElement self = $x("//form[contains(@class, 'MuiBox-root')]");
+public class SearchField extends BaseComponent<SearchField> {
 
     private final By searchField = By.cssSelector("input[aria-label='search']");
+
+    public SearchField() {
+        super($x("//form[contains(@class, 'MuiBox-root')]"));
+    }
 
     @Step("Выполнение поиска по запросу: {query}")
     public SearchField searchField(@Nonnull String query) {
         clearIfNotEmpty();
-        self.$(searchField).setValue(query).pressEnter();
+        getSelf().$(searchField).setValue(query).pressEnter();
         return this;
     }
 
     @Step("Очистка поля поиска, если оно не пустое")
     public SearchField clearIfNotEmpty() {
-        if (self.$(searchField).is(not(empty))) {
-            self.$("#input-submit").shouldBe(visible).click();
+        if (getSelf().$(searchField).is(not(empty))) {
+            getSelf().$("#input-submit").shouldBe(visible).click();
         }
         return this;
     }

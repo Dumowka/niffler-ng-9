@@ -16,7 +16,7 @@ public class UserDbTest {
 
     private UsersClient usersClient;
 
-    private static String name = "a24";
+    private static String name = "a29";
 
     @Test
     void checkCreatingUser() {

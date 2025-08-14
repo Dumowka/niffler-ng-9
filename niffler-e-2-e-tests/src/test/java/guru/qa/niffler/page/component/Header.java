@@ -1,6 +1,5 @@
 package guru.qa.niffler.page.component;
 
-import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.EditSpendingPage;
 import guru.qa.niffler.page.FriendsPage;
 import guru.qa.niffler.page.LoginPage;
@@ -16,20 +15,23 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 @ParametersAreNonnullByDefault
-public class Header {
-    private final SelenideElement self = $("#root header");
-
+public class Header extends BaseComponent<Header> {
+    
     private final HeaderMenu headerMenu = new HeaderMenu();
+
+    public Header() {
+        super($("#root header"));
+    }
 
     @Step("Проверка заголовка на наличие текста 'Niffler'")
     public Header checkHeaderText() {
-        self.$("h1.MuiTypography-root").shouldBe(visible).shouldHave(text("Niffler"));
+        getSelf().$("h1.MuiTypography-root").shouldBe(visible).shouldHave(text("Niffler"));
         return this;
     }
 
     @Step("Раскрытие меню пользователя")
     public Header openMenu() {
-        self.shouldBe(visible).$("[data-testid='PersonIcon']").click();
+        getSelf().shouldBe(visible).$("[data-testid='PersonIcon']").click();
         return this;
     }
 
@@ -59,13 +61,13 @@ public class Header {
 
     @Step("Переход на страницу 'Add new spending'")
     public EditSpendingPage addSpendingPage() {
-        self.$("a[href='/spending']").shouldBe(visible).click();
+        getSelf().$("a[href='/spending']").shouldBe(visible).click();
         return new EditSpendingPage();
     }
 
     @Step("Переход на главную страницу")
     public MainPage toMainPage() {
-        self.$("[alt='Niffler logo']").shouldBe(visible).click();
+        getSelf().$("[alt='Niffler logo']").shouldBe(visible).click();
         return new MainPage();
     }
 }

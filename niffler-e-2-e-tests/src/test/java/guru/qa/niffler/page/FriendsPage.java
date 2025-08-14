@@ -1,7 +1,6 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
-import guru.qa.niffler.page.component.AlertWindow;
 import guru.qa.niffler.page.component.DeclineFriendshipDialogWindow;
 import guru.qa.niffler.page.component.SearchField;
 import io.qameta.allure.Step;
@@ -14,12 +13,11 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
-public class FriendsPage {
+public class FriendsPage extends BasePage<FriendsPage> {
     private final SelenideElement friendsTableShowButton = $x("//h2[text()='Friends']");
     private final SelenideElement allPeopleTableShowButton = $x("//h2[text()='All people']");
     private final SelenideElement requestsToFriendTable = $("#requests");
     private final SelenideElement friendsTable = $("#friends");
-    private final SelenideElement allPeopleTable = $("#all");
     private final SelenideElement noUserLabel = $x("//p[text()='There are no users yet']");
 
     private final String acceptButtonXpath = ".//button[text()='Accept']";
@@ -27,7 +25,15 @@ public class FriendsPage {
 
     private final SearchField searchField = new SearchField();
     private final DeclineFriendshipDialogWindow declineFriendshipDialogWindow = new DeclineFriendshipDialogWindow();
-    private final AlertWindow alertWindow = new AlertWindow();
+
+    @Override
+    @Step("Проверка, что страница 'Friends' загружена")
+    public FriendsPage checkThatPageLoaded() {
+        friendsTableShowButton.shouldBe(visible);
+        allPeopleTableShowButton.shouldBe(visible);
+        friendsTable.shouldBe(visible);
+        return this;
+    }
 
     @Step("Поиск пользователя по имени: {name}")
     public FriendsPage searchPeople(String name) {
@@ -42,23 +48,9 @@ public class FriendsPage {
     }
 
     @Step("Открытие вкладки 'All people'")
-    public FriendsPage clickOnAllPeopleTable() {
+    public PeoplePage clickOnAllPeopleTable() {
         allPeopleTableShowButton.click();
-        return this;
-    }
-
-    @Step("Проверка, что в таблице 'All people' есть запись с именем: {rowName}")
-    public FriendsPage checkRowInAllPeopleTable(String rowName) {
-        getRowInTable(allPeopleTable, rowName).shouldBe(visible)
-                .$x(".//button[text()='Add friend']").shouldBe(visible);
-        return this;
-    }
-
-    @Step("Проверка исходящей заявки в друзья для: {name}")
-    public FriendsPage checkOutcomeInvitation(String name) {
-        getRowInTable(allPeopleTable, name).shouldBe(visible)
-                .$x(".//span[text()='Waiting...']").shouldBe(visible);
-        return this;
+        return new PeoplePage();
     }
 
     @Step("Проверка, что {name} находится в списке друзей")
@@ -88,7 +80,7 @@ public class FriendsPage {
         SelenideElement row = getRowInTable(requestsToFriendTable, name).shouldBe(visible);
         row.$x(declineButtonXpath).shouldBe(visible).click();
         declineFriendshipDialogWindow.checkThatWindowIsAppear().clickOnDeclineButton();
-        alertWindow.declineFriendshipDialogWindowIsAppeared(name);
+        checkAlert(String.format("Invitation of %s is declined", name));
         return this;
     }
 
