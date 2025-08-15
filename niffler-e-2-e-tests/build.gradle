@@ -131,6 +131,31 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+def firstTest = tasks.register('firstTest', Test) {
+    useJUnitPlatform {
+        includeTags 'first'
+    }
+}
+
+def otherTests = tasks.register('otherTests', Test) {
+    useJUnitPlatform {
+        excludeTags 'first', 'last'
+    }
+}
+
+def lastTest = tasks.register('lastTest', Test) {
+    useJUnitPlatform {
+        includeTags 'last'
+    }
+}
+
+firstTest.configure { finalizedBy(otherTests) }
+otherTests.configure { finalizedBy(lastTest) }
+
+tasks.register('testOrdered') {
+    dependsOn(firstTest)
+}
+
 tasks.register('printVersion') {
     doLast {
         println project.version
