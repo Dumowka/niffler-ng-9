@@ -13,7 +13,7 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 public interface SpendClient {
     @Nonnull
-    static SpendClient getInstanse() {
+    static SpendClient getInstance() {
         return new SpendDbClient();
     }
 

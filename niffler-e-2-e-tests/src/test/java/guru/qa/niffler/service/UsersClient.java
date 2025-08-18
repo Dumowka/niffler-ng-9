@@ -14,7 +14,7 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 public interface UsersClient {
     @Nonnull
-    static UsersClient getInstanse() {
+    static UsersClient getInstance() {
         return new UsersDbClient();
     }
 

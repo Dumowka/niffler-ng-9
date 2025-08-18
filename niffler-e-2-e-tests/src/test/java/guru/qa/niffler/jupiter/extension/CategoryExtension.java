@@ -24,7 +24,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
 
-    private final SpendClient spendClient = SpendClient.getInstanse();
+    private final SpendClient spendClient = SpendClient.getInstance();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {

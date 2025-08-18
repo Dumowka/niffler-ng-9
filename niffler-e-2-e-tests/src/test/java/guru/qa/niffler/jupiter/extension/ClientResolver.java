@@ -13,11 +13,11 @@ public class ClientResolver implements TestInstancePostProcessor {
         for (Field field : testInstance.getClass().getDeclaredFields()) {
             if (field.getType().isAssignableFrom(SpendClient.class)) {
                 field.setAccessible(true);
-                field.set(testInstance, SpendClient.getInstanse());
+                field.set(testInstance, SpendClient.getInstance());
             }
             if (field.getType().isAssignableFrom(UsersClient.class)) {
                 field.setAccessible(true);
-                field.set(testInstance, UsersClient.getInstanse());
+                field.set(testInstance, UsersClient.getInstance());
             }
         }
     }
