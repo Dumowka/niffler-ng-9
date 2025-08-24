@@ -17,8 +17,10 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
+import static java.util.Arrays.stream;
 
 public class SpendingExtension implements BeforeEachCallback, ParameterResolver {
 
@@ -35,11 +37,30 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
             if (ArrayUtils.isNotEmpty(userAnnotation.spendings())) {
                 UserJson createdUser = UserExtension.createdUser();
                 String username = createdUser != null ? createdUser.username() : userAnnotation.username();
-                List<SpendJson> result = new ArrayList<>();
 
+                final List<CategoryJson> existingCategories = createdUser != null
+                        ? createdUser.testData().categories()
+                        : stream(CategoryExtension.createdCategory()).toList();
+
+                List<SpendJson> result = new ArrayList<>();
                 if (!"".equals(username)) {
                     for (Spending spending : userAnnotation.spendings()) {
-                        result.add(createSpend(userAnnotation, username, spending));
+                        final Optional<CategoryJson> matchedCategory = existingCategories.stream()
+                                .filter(category -> category.name().equals(spending.category()))
+                                .findFirst();
+
+                        result.add(
+                                createSpend(
+                                        spending,
+                                        username,
+                                        matchedCategory.orElseGet(() -> new CategoryJson(
+                                                null,
+                                                spending.category(),
+                                                username,
+                                                false
+                                        ))
+                                )
+                        );
                     }
                 }
 
@@ -65,18 +86,12 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
         return createdSpending();
     }
 
-    private SpendJson createSpend(User userAnnotation, String username, Spending spending) {
-        CategoryJson categoryJson = new CategoryJson(
-                null,
-                spending.category(),
-                username,
-                false
-        );
+    private SpendJson createSpend(Spending spending, String username, CategoryJson category) {
         return spendClient.create(
                 new SpendJson(
                         null,
                         new Date(),
-                        categoryJson,
+                        category,
                         spending.currency(),
                         spending.amount(),
                         spending.description(),

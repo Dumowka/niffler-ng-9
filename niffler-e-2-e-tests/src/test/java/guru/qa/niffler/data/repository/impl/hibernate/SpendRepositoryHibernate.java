@@ -23,6 +23,10 @@ public class SpendRepositoryHibernate implements SpendRepository {
     @Override
     public @Nonnull SpendEntity create(SpendEntity spend) {
         entityManager.joinTransaction();
+        if (spend.getCategory().getId() != null) {
+            CategoryEntity categoryRef = entityManager.getReference(CategoryEntity.class, spend.getCategory().getId());
+            spend.setCategory(categoryRef);
+        }
         entityManager.persist(spend);
         return spend;
     }
