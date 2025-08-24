@@ -5,7 +5,6 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.spend.CategoryJson;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.service.SpendClient;
-import guru.qa.niffler.utils.RandomDataUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
+import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
@@ -39,7 +39,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
 
                 if (!"".equals(username)) {
                     for (Category category : userAnnotation.categories()) {
-                        result.add(createCategory(userAnnotation, username, category.archived()));
+                        result.add(createCategory(category, username));
                     }
                 }
                 if (createdUser != null) {
@@ -89,12 +89,12 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 .get(methodContext.getUniqueId(), CategoryJson[].class);
     }
 
-    private CategoryJson createCategory(User userAnnotation, String username, boolean isArchived) {
+    private CategoryJson createCategory(Category category, String username) {
         CategoryJson categoryJson = new CategoryJson(
                 null,
-                RandomDataUtils.randomCategoryName(),
+                "".equals(category.name()) ? randomCategoryName() : category.name(),
                 username,
-                isArchived
+                category.archived()
         );
         return spendClient.createCategory(categoryJson);
     }
