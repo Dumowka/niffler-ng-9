@@ -1,23 +1,31 @@
 package guru.qa.niffler.page;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.component.Header;
+import guru.qa.niffler.utils.ScreenDiffResult;
 import io.qameta.allure.Step;
 import lombok.Getter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.By;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
+import static guru.qa.niffler.utils.PageUtils.getElementScreenshot;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ParametersAreNonnullByDefault
 public class UserProfilePage extends BasePage<UserProfilePage> {
 
+    private final SelenideElement photo = $("#image__input").parent().$("img");
     private final SelenideElement uploadNewPictureButton = $("label[for='image__input']");
+    private final SelenideElement photoInput = $("input[type='file']");
     private final SelenideElement usernameInput = $("input[name='username']");
     private final SelenideElement nameInput = $("input[name='name']");
     private final SelenideElement submitButton = $("button[type='submit']");
@@ -41,6 +49,12 @@ public class UserProfilePage extends BasePage<UserProfilePage> {
     @Step("Нажатие кнопки загрузки нового изображения профиля")
     public UserProfilePage clickUploadNewPictureButton() {
         uploadNewPictureButton.click();
+        return this;
+    }
+
+    @Step("Загрузка фото из classpath")
+    public UserProfilePage uploadPhotoFromClasspath(String path) {
+        photoInput.uploadFromClasspath(path);
         return this;
     }
 
@@ -119,6 +133,19 @@ public class UserProfilePage extends BasePage<UserProfilePage> {
     @Step("Проверка, что категория существует: {categoryName}")
     public UserProfilePage checkThatCategoryExist(String categoryName) {
         getCategoryButton(categoryName).shouldBe(Condition.visible);
+        return this;
+    }
+
+    @Step("Проверка, что фото соответствует ожидаемому")
+    public UserProfilePage checkPhoto(BufferedImage expected) throws IOException {
+        Selenide.sleep(1000);
+        BufferedImage actual = getElementScreenshot(photo);
+        assertFalse(
+                new ScreenDiffResult(
+                        expected,
+                        actual
+                )
+        );
         return this;
     }
 

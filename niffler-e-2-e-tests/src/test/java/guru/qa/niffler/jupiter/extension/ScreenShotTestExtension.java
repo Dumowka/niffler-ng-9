@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 public class ScreenShotTestExtension implements ParameterResolver, TestExecutionExceptionHandler {
@@ -33,22 +34,49 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
     @SneakyThrows
     @Override
     public BufferedImage resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return ImageIO.read(new ClassPathResource("img/expected-stat.png").getInputStream());
+        return extensionContext.getTestMethod()
+                .map(m -> m.getAnnotation(ScreenShotTest.class))
+                .map(ScreenShotTest::value)
+                .map(path -> {
+                    try {
+                        return ImageIO.read(new ClassPathResource(path).getInputStream());
+                    } catch (IOException e) {
+                        throw new ParameterResolutionException("Не удалось загрузить изображение: " + path, e);
+                    }
+                })
+                .orElseThrow(() -> new ParameterResolutionException("Аннотация @ScreenShotTest не найдена"));
     }
 
     @Override
     public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
-        ScreenDif screenDif = new ScreenDif(
-                "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getExpected())),
-                "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getActual())),
-                "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getDiff()))
-        );
+        ScreenShotTest annotation = AnnotationSupport.findAnnotation(
+                context.getRequiredTestMethod(),
+                ScreenShotTest.class
+        ).orElseThrow(() -> new ParameterResolutionException("Аннотация @ScreenShotTest не найдена"));
 
-        Allure.addAttachment(
-                "Screenshot diff",
-                "application/vnd.allure.image.diff",
-                OBJECT_MAPPER.writeValueAsString(screenDif)
-        );
+        if (annotation.rewriteExpected()) {
+            final BufferedImage actual = getActual();
+            if (actual != null) {
+                ImageIO.write(
+                        actual,
+                        "png",
+                        Paths.get("src/test/resources/" + annotation.value()).toFile()
+                );
+            }
+        } else {
+            ScreenDif screenDif = new ScreenDif(
+                    "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getExpected())),
+                    "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getActual())),
+                    "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getDiff()))
+            );
+
+            Allure.addAttachment(
+                    "Screenshot diff",
+                    "application/vnd.allure.image.diff",
+                    OBJECT_MAPPER.writeValueAsString(screenDif)
+            );
+        }
+
         throw throwable;
     }
 
