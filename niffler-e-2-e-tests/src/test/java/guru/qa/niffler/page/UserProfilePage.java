@@ -17,6 +17,7 @@ import java.io.IOException;
 import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
+import static guru.qa.niffler.jupiter.extension.ScreenShotTestExtension.ASSERT_SCREEN_MESSAGE;
 import static guru.qa.niffler.utils.PageUtils.getElementScreenshot;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -144,7 +145,8 @@ public class UserProfilePage extends BasePage<UserProfilePage> {
                 new ScreenDiffResult(
                         expected,
                         actual
-                )
+                ),
+                ASSERT_SCREEN_MESSAGE
         );
         return this;
     }

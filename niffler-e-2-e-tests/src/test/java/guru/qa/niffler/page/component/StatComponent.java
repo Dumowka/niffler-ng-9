@@ -4,6 +4,7 @@ import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.utils.ScreenDiffResult;
 import io.qameta.allure.Step;
 
@@ -12,6 +13,8 @@ import java.io.IOException;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
+import static guru.qa.niffler.condition.StatConditions.color;
+import static guru.qa.niffler.jupiter.extension.ScreenShotTestExtension.ASSERT_SCREEN_MESSAGE;
 import static guru.qa.niffler.utils.PageUtils.getElementScreenshot;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -41,7 +44,8 @@ public class StatComponent extends BaseComponent<StatComponent> {
                 new ScreenDiffResult(
                         expected,
                         actual
-                )
+                ),
+                ASSERT_SCREEN_MESSAGE
         );
         return this;
     }
@@ -49,6 +53,11 @@ public class StatComponent extends BaseComponent<StatComponent> {
     @Step("Проверка, что в статистике имеется {0}")
     public StatComponent checkStatisticBubblesContains(String... texts) {
         bubbles.shouldHave(CollectionCondition.texts(texts));
+        return this;
+    }
+
+    public StatComponent checkBubblesColor(Color... expectedColors) {
+        bubbles.shouldBe(color(expectedColors));
         return this;
     }
 }

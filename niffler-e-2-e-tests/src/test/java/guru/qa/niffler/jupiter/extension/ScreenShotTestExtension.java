@@ -25,6 +25,8 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ScreenShotTestExtension.class);
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    public static final String ASSERT_SCREEN_MESSAGE = "Screen comparison failure";
+
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return AnnotationSupport.isAnnotated(extensionContext.getRequiredTestMethod(), ScreenShotTest.class) &&
@@ -63,7 +65,7 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
                         Paths.get("src/test/resources/" + annotation.value()).toFile()
                 );
             }
-        } else {
+        } else if (throwable.getMessage().contains(ASSERT_SCREEN_MESSAGE)) {
             ScreenDif screenDif = new ScreenDif(
                     "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getExpected())),
                     "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getActual())),
