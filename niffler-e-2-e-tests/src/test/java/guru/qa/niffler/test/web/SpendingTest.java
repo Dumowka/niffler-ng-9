@@ -10,6 +10,7 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.spend.SpendJson;
+import guru.qa.niffler.model.ui.Bubble;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.utils.RandomDataUtils;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 @WebTest
 public class SpendingTest {
@@ -109,12 +111,16 @@ public class SpendingTest {
     )
     @ScreenShotTest(value = "img/expected-stat-archived.png")
     void statComponentShouldDisplayArchivedCategories(UserJson user, BufferedImage expected) throws IOException {
+        List<SpendJson> spends = user.testData().spendings();
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
+                .checkSpendings(spends.toArray(new SpendJson[spends.size()]))
                 .getStatComponent()
-                .checkStatisticBubblesContains("Поездки 9500 ₽", "Archived 3100 ₽")
                 .checkStatisticsImage(expected)
-                .checkBubblesColor(Color.YELLOW);
+                .checkBubbles(
+                        new Bubble(Color.YELLOW, "Поездки 9500 ₽"),
+                        new Bubble(Color.GREEN, "Archived 3100 ₽")
+                );
     }
 }

@@ -1,5 +1,6 @@
 package guru.qa.niffler.page;
 
+import guru.qa.niffler.model.spend.SpendJson;
 import guru.qa.niffler.page.component.DataFilterValues;
 import guru.qa.niffler.page.component.DeleteSpendingsDialogWindow;
 import guru.qa.niffler.page.component.Header;
@@ -74,5 +75,9 @@ public class MainPage extends BasePage<MainPage> {
         return this;
     }
 
-
+    @Step("Проверка наличия затрат {expectedSpends}")
+    public MainPage checkSpendings(SpendJson... expectedSpends) {
+        spendingTable.checkSpends(expectedSpends);
+        return this;
+    }
 }
