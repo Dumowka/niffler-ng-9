@@ -4,7 +4,8 @@ import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
-import guru.qa.niffler.condition.Color;
+import guru.qa.niffler.condition.StatConditions;
+import guru.qa.niffler.model.ui.Bubble;
 import guru.qa.niffler.utils.ScreenDiffResult;
 import io.qameta.allure.Step;
 
@@ -13,7 +14,6 @@ import java.io.IOException;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
-import static guru.qa.niffler.condition.StatConditions.color;
 import static guru.qa.niffler.jupiter.extension.ScreenShotTestExtension.ASSERT_SCREEN_MESSAGE;
 import static guru.qa.niffler.utils.PageUtils.getElementScreenshot;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -56,8 +56,21 @@ public class StatComponent extends BaseComponent<StatComponent> {
         return this;
     }
 
-    public StatComponent checkBubblesColor(Color... expectedColors) {
-        bubbles.shouldBe(color(expectedColors));
+    @Step("Проверка, что статистика состоит из {0}")
+    public StatComponent checkBubbles(Bubble... expectedBubbles) {
+        bubbles.shouldBe(StatConditions.statBubbles(expectedBubbles));
+        return this;
+    }
+
+    @Step("Проверка, что статистика состоит в любом порядке из {0}")
+    public StatComponent checkBubblesInAnyOrder(Bubble... expectedBubbles) {
+        bubbles.shouldBe(StatConditions.statBubblesInAnyOrder(expectedBubbles));
+        return this;
+    }
+
+    @Step("Проверка, что в статистике имеется {0}")
+    public StatComponent checkBubbleContains(Bubble... expectedBubbles) {
+        bubbles.shouldBe(StatConditions.statBubblesContains(expectedBubbles));
         return this;
     }
 }
