@@ -22,15 +22,16 @@ public class BrowserExtension implements
         TestExecutionExceptionHandler,
         LifecycleMethodExecutionExceptionHandler {
 
-    private final List<SelenideDriver> drivers = new ArrayList<>();
+    private static final ThreadLocal<List<SelenideDriver>> drivers = ThreadLocal.withInitial(ArrayList::new);
+//    private final List<SelenideDriver> drivers = new ArrayList<>();
 
     public List<SelenideDriver> drivers() {
-        return drivers;
+        return drivers.get();
     }
 
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
-        for (SelenideDriver driver : drivers) {
+        for (SelenideDriver driver : drivers.get()) {
             if (driver.hasWebDriverStarted()) {
                 driver.close();
             }
@@ -64,7 +65,7 @@ public class BrowserExtension implements
     }
 
     private void doScreenshot() {
-        for (SelenideDriver driver : drivers) {
+        for (SelenideDriver driver : drivers.get()) {
             if (driver.hasWebDriverStarted()) {
                 Allure.addAttachment(
                         "Screen on fail for browser " + driver.getSessionId(),
