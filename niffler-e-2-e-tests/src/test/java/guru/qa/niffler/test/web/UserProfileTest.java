@@ -1,6 +1,6 @@
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
@@ -11,6 +11,7 @@ import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.UserProfilePage;
 import guru.qa.niffler.utils.RandomDataUtils;
+import guru.qa.niffler.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
@@ -19,12 +20,14 @@ import java.io.IOException;
 @WebTest
 public class UserProfileTest {
 
+    private final SelenideDriver driver = new SelenideDriver(SelenideUtils.chromeConfig);
+
     private static final Config CFG = Config.getInstance();
 
     @Test
     @User
     void mainPageShouldBeDisplayedAfterSuccessLogin(UserJson user) {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
+        driver.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .getHeader().toProfilePage()
@@ -40,7 +43,7 @@ public class UserProfileTest {
     void archivedCategoryShouldPresentInCategoriesList(UserJson user) {
         final CategoryJson category = user.testData().categories().getFirst();
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
+        driver.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .getHeader().toProfilePage()
@@ -56,7 +59,7 @@ public class UserProfileTest {
     void activeCategoryShouldPresentInCategoriesList(UserJson user) {
         final CategoryJson category = user.testData().categories().getFirst();
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
+        driver.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .getHeader().toProfilePage()
@@ -68,7 +71,7 @@ public class UserProfileTest {
     void editProfile(UserJson user) {
         String newName = RandomDataUtils.randomName();
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
+        driver.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .getHeader().toProfilePage()
@@ -83,7 +86,7 @@ public class UserProfileTest {
     @User
     @ScreenShotTest(value = "img/expected-avatar.png")
     void shouldUpdateProfilePhoto(UserJson user, BufferedImage expectedAvatar) throws IOException {
-        UserProfilePage profilePage = Selenide.open(CFG.frontUrl(), LoginPage.class)
+        UserProfilePage profilePage = driver.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit()
                 .checkThatPageLoaded()
@@ -91,7 +94,7 @@ public class UserProfileTest {
                 .uploadPhotoFromClasspath("img/cat.jpeg")
                 .clickOnSubmitButton();
 
-        Selenide.refresh();
+        driver.refresh();
 
         profilePage.checkPhoto(expectedAvatar);
     }
