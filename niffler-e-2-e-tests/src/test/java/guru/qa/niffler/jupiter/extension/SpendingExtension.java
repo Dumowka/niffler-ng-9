@@ -35,7 +35,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                 User.class
         ).ifPresent(userAnnotation -> {
             if (ArrayUtils.isNotEmpty(userAnnotation.spendings())) {
-                UserJson createdUser = UserExtension.createdUser();
+                UserJson createdUser = UserExtension.getCreatedUser();
                 String username = createdUser != null ? createdUser.username() : userAnnotation.username();
 
                 final List<CategoryJson> existingCategories = createdUser != null

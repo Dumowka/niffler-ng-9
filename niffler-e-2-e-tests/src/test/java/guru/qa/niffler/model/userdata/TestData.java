@@ -5,6 +5,7 @@ import guru.qa.niffler.model.spend.SpendJson;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -16,6 +17,10 @@ public record TestData(
         List<CategoryJson> categories,
         List<SpendJson> spendings
 ) {
+    public TestData(String password) {
+        this(password, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    }
+
     public @Nonnull TestData addCategories(List<CategoryJson> categories) {
         return new TestData(
                 this.password,

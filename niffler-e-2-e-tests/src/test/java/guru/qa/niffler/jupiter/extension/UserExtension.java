@@ -15,8 +15,6 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
-
 public class UserExtension implements BeforeEachCallback, ParameterResolver {
 
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserExtension.class);
@@ -33,6 +31,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
             if ("".equals(userAnnotation.username())) {
                 final String username = RandomDataUtils.randomUsername();
                 UserJson created = usersClient.createUser(username, DEFAULT_PASSWORD);
+
                 final List<UserJson> incomes = usersClient.addIncomeInvitation(created, userAnnotation.incomeInvitations());
                 final List<UserJson> outcomes = usersClient.addOutcomeInvitation(created, userAnnotation.outcomeInvitations());
                 final List<UserJson> friends = usersClient.addFriend(created, userAnnotation.friends());
@@ -45,10 +44,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                         new ArrayList<>(),
                         new ArrayList<>()
                 );
-                context.getStore(NAMESPACE).put(
-                        context.getUniqueId(),
-                        created.addTestData(testData)
-                );
+                setUser(created.addTestData(testData));
             }
         });
     }
@@ -60,12 +56,19 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
 
     @Override
     public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return createdUser();
+        return getCreatedUser();
     }
 
-    public static UserJson createdUser() {
-        final ExtensionContext methodContext = context();
-        return methodContext.getStore(NAMESPACE)
-                .get(methodContext.getUniqueId(), UserJson.class);
+    public static UserJson getCreatedUser() {
+        final ExtensionContext context = TestMethodContextExtension.context();
+        return context.getStore(NAMESPACE).get(context.getUniqueId(), UserJson.class);
+    }
+
+    public static void setUser(UserJson created) {
+        final ExtensionContext context = TestMethodContextExtension.context();
+        context.getStore(NAMESPACE).put(
+                context.getUniqueId(),
+                created
+        );
     }
 }

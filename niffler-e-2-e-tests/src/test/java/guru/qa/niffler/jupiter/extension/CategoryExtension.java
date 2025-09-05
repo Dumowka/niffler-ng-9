@@ -33,7 +33,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 User.class
         ).ifPresent(userAnnotation -> {
             if (ArrayUtils.isNotEmpty(userAnnotation.categories())) {
-                UserJson createdUser = UserExtension.createdUser();
+                UserJson createdUser = UserExtension.getCreatedUser();
                 String username = createdUser != null ? createdUser.username() : userAnnotation.username();
                 List<CategoryJson> result = new ArrayList<>();
 

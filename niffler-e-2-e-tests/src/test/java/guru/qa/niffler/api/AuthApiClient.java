@@ -1,10 +1,14 @@
 package guru.qa.niffler.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import guru.qa.niffler.api.core.CodeInterceptor;
 import guru.qa.niffler.api.core.ThreadSafeCookieStore;
+import guru.qa.niffler.jupiter.extension.ApiLoginExtension;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.service.AuthClient;
 import guru.qa.niffler.service.RestClient;
+import guru.qa.niffler.utils.OauthUtils;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.StopWatch;
 import retrofit2.Response;
 
@@ -13,8 +17,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ParametersAreNonnullByDefault
 public class AuthApiClient extends RestClient implements AuthClient {
 
@@ -22,7 +24,7 @@ public class AuthApiClient extends RestClient implements AuthClient {
     private final UserdataApiClient userdataApi;
 
     public AuthApiClient() {
-        super(CFG.authUrl(), true);
+        super(CFG.authUrl(), true, new CodeInterceptor());
         authApi = create(AuthApi.class);
         userdataApi = new UserdataApiClient();
     }
@@ -58,56 +60,36 @@ public class AuthApiClient extends RestClient implements AuthClient {
         throw new AssertionError("Timed out waiting for register");
     }
 
-    @Override
-    public void authorize(String codeChallenge) {
-        Response<Void> response;
-        try {
-            response = authApi.authorize(
-                    "code",
-                    "client",
-                    "openid",
-                    CFG.frontUrl() + "authorized",
-                    codeChallenge,
-                    "S256"
-
-            ).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        assertEquals(200, response.code());
-    }
-
-    @Override
+    @SneakyThrows
     public String login(String username, String password) {
-        Response<Void> response;
-        try {
-            response = authApi.login(
-                    username,
-                    password,
-                    ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
-            ).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        assertEquals(200, response.code());
-        return response.raw().request().url().toString().split("\\?code=")[1];
-    }
+        final String codeVerifier = OauthUtils.generateCodeVerifier();
+        final String codeChallenge = OauthUtils.generateCodeChallenge(codeVerifier);
+        final String clientId = "client";
+        final String redirectUri = CFG.frontUrl() + "authorized";
 
-    @Override
-    public String token(String code, String codeVerifier) {
-        Response<JsonNode> response;
-        try {
-            response = authApi.token(
-                    code,
-                    CFG.frontUrl() + "authorized",
-                    codeVerifier,
-                    "authorization_code",
-                    "client"
-            ).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        assertEquals(200, response.code());
-        return response.body().get("id_token").asText();
+        authApi.authorize(
+                "code",
+                clientId,
+                "openid",
+                redirectUri,
+                codeChallenge,
+                "S256"
+        ).execute();
+
+        authApi.login(
+                username,
+                password,
+                ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
+        ).execute();
+
+        Response<JsonNode> tokenResponse = authApi.token(
+                ApiLoginExtension.getCode(),
+                redirectUri,
+                codeVerifier,
+                "authorization_code",
+                clientId
+        ).execute();
+
+        return tokenResponse.body().get("id_token").asText();
     }
 }
