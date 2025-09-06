@@ -20,4 +20,11 @@ public interface UserdataApi {
             @Query("username") String username,
             @Nullable @Query("searchQuery") String searchQuery
     );
+
+    @GET("internal/friends/all")
+    Call<List<UserJson>> friends(
+            @Query("username") String username,
+            @Nullable @Query("searchQuery") String searchQuery
+    );
+
 }

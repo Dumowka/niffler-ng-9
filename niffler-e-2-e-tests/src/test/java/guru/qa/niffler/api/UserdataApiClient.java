@@ -50,4 +50,19 @@ public class UserdataApiClient extends RestClient implements UserdataClient {
                 ? response.body()
                 : Collections.emptyList();
     }
+
+    @NotNull
+    @Override
+    public List<UserJson> friends(String username, @Nullable String searchQuery) {
+        final Response<List<UserJson>> response;
+        try {
+            response = userdataApi.friends(username, searchQuery).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
+    }
 }

@@ -22,8 +22,8 @@ public class UserProfileTest {
 
     private static final Config CFG = Config.getInstance();
 
-    @Test
     @User
+    @Test
     void mainPageShouldBeDisplayedAfterSuccessLogin(UserJson user) {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
@@ -37,14 +37,12 @@ public class UserProfileTest {
                     archived = true
             )
     )
+    @ApiLogin
     @Test
     void archivedCategoryShouldPresentInCategoriesList(UserJson user) {
         final CategoryJson category = user.testData().categories().getFirst();
 
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit()
-                .getHeader().toProfilePage()
+        Selenide.open(UserProfilePage.URL, UserProfilePage.class)
                 .checkThatCategoryNonExist(category.name())
                 .clickOnShowArchivedCheckbox(true)
                 .checkThatCategoryExist(category.name());
@@ -53,14 +51,11 @@ public class UserProfileTest {
     @User(
             categories = @Category()
     )
+    @ApiLogin
     @Test
     void activeCategoryShouldPresentInCategoriesList(UserJson user) {
         final CategoryJson category = user.testData().categories().getFirst();
-
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit()
-                .getHeader().toProfilePage()
+        Selenide.open(UserProfilePage.URL, UserProfilePage.class)
                 .checkThatCategoryExist(category.name());
     }
 
@@ -70,7 +65,7 @@ public class UserProfileTest {
     void editProfile() {
         String newName = RandomDataUtils.randomName();
 
-        Selenide.open(CFG.frontUrl() + "profile", UserProfilePage.class)
+        Selenide.open(UserProfilePage.URL, UserProfilePage.class)
                 .setName(newName)
                 .clickOnSubmitButton()
                 .checkName(newName)
@@ -80,13 +75,10 @@ public class UserProfileTest {
     }
 
     @User
+    @ApiLogin
     @ScreenShotTest(value = "img/expected-avatar.png")
     void shouldUpdateProfilePhoto(UserJson user, BufferedImage expectedAvatar) throws IOException {
-        UserProfilePage profilePage = Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit()
-                .checkThatPageLoaded()
-                .getHeader().toProfilePage()
+        UserProfilePage profilePage = Selenide.open(UserProfilePage.URL, UserProfilePage.class)
                 .uploadPhotoFromClasspath("img/cat.jpeg")
                 .clickOnSubmitButton();
 

@@ -7,6 +7,7 @@ import guru.qa.niffler.model.CurrencyValues;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -17,8 +18,8 @@ public record UserJson(
         String firstname,
         String surname,
         String fullname,
-        byte[] photo,
-        byte[] photoSmall,
+        String photo,
+        String photoSmall,
         @Nullable FriendshipStatus friendshipStatus,
         @JsonIgnore
         @Nullable TestData testData
@@ -35,8 +36,8 @@ public record UserJson(
                 entity.getFirstname(),
                 entity.getSurname(),
                 entity.getFullname(),
-                entity.getPhoto(),
-                entity.getPhotoSmall(),
+                entity.getPhoto() != null && entity.getPhoto().length > 0 ? new String(entity.getPhoto(), StandardCharsets.UTF_8) : null,
+                entity.getPhotoSmall() != null && entity.getPhotoSmall().length > 0 ? new String(entity.getPhotoSmall(), StandardCharsets.UTF_8) : null,
                 friendshipStatus,
                 null
         );

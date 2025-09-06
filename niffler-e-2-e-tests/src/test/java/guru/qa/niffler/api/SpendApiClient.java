@@ -6,6 +6,7 @@ import guru.qa.niffler.model.spend.SpendJson;
 import guru.qa.niffler.service.RestClient;
 import guru.qa.niffler.service.SpendClient;
 import io.qameta.allure.Step;
+import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;
@@ -56,6 +57,25 @@ public final class SpendApiClient extends RestClient implements SpendClient {
         return response.body();
     }
 
+    @NotNull
+    public List<SpendJson> all(
+            String username,
+            @Nullable CurrencyValues filterCurrency,
+            @Nullable Date from,
+            @Nullable Date to
+    ) {
+        final Response<List<SpendJson>> response;
+        try {
+            response = spendApi.getSpends(username, filterCurrency, from, to).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
+    }
+
     @Override
     @Step("Создание категории через API: {category.name}")
     public @Nullable CategoryJson createCategory(CategoryJson category) {
@@ -80,6 +100,20 @@ public final class SpendApiClient extends RestClient implements SpendClient {
         }
         assertEquals(200, response.code());
         return response.body();
+    }
+
+    @NotNull
+    public List<CategoryJson> allCategories(String username, boolean excludeArchived) {
+        final Response<List<CategoryJson>> response;
+        try {
+            response = spendApi.getCategories(username, excludeArchived).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
     }
 
     @Override

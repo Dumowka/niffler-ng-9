@@ -6,6 +6,7 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.page.RegisterPage;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ public class RegistrationTest {
     }
 
     @Test
-    void shouldOpenLoginPageAfterClickOn() {
+    void shouldOpenLoginPageAfterClickOnAlreadyHaveAnAccountLoginLink() {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .goToRegisterPage()
                 .clickOnAlreadyHaveAnAccountLoginLink()
@@ -36,8 +37,7 @@ public class RegistrationTest {
 
     @Test
     void shouldRegisterNewUser() {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .goToRegisterPage()
+        Selenide.open(RegisterPage.URL, RegisterPage.class)
                 .checkThatPageLoaded()
                 .fillRegisterPage(username, password, password)
                 .submitRegistration()
@@ -52,8 +52,7 @@ public class RegistrationTest {
     @Test
     @User
     void shouldNotRegisterUserWithExistingUsername(UserJson user) {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .goToRegisterPage()
+        Selenide.open(RegisterPage.URL, RegisterPage.class)
                 .fillRegisterPage(user.username(), user.testData().password(), user.testData().password())
                 .submitRegistration()
                 .checkErrorText(String.format("Username `%s` already exists", user.username()));
@@ -61,8 +60,7 @@ public class RegistrationTest {
 
     @Test
     void passwordFieldShouldBeRevealedAfterRevealButtonsClicked() {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .goToRegisterPage()
+        Selenide.open(RegisterPage.URL, RegisterPage.class)
                 .fillRegisterPage(username, password, password)
                 .checkThatPasswordIsHidden()
                 .revealPassword()
@@ -74,8 +72,7 @@ public class RegistrationTest {
 
     @Test
     void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual() {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .goToRegisterPage()
+        Selenide.open(RegisterPage.URL, RegisterPage.class)
                 .fillRegisterPage(username, password, password + "_invalid")
                 .submitRegistration()
                 .checkErrorText(PASSWORDS_SHOULD_BE_EQUAL.getText());

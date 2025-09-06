@@ -14,6 +14,9 @@ import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
 public class RegisterPage extends BasePage<RegisterPage> {
+
+    public static final String URL = CFG.authUrl() + "register";
+
     private final SelenideElement alreadyHaveAnAccountLoginLink= $("a[href='/login']");
     private final SelenideElement usernameInput = $("input[name='username']");
     private final SelenideElement passwordInput = $("input[name='password']");

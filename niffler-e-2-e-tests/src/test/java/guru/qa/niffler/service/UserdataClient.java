@@ -21,4 +21,7 @@ public interface UserdataClient {
 
     @Nonnull
     List<UserJson> allUsers(String username, @Nullable String searchQuery);
+
+    @Nonnull
+    List<UserJson> friends(String username, @Nullable String searchQuery);
 }

@@ -13,6 +13,8 @@ import static com.codeborne.selenide.Selenide.$x;
 @ParametersAreNonnullByDefault
 public class PeoplePage extends BasePage<PeoplePage> {
 
+    public static final String URL = CFG.frontUrl() + "people/all";
+
     private final SelenideElement friendsTableShowButton = $x("//h2[text()='Friends']");
     private final SelenideElement allPeopleTableShowButton = $x("//h2[text()='All people']");
     private final SelenideElement allPeopleTable = $("#all");
