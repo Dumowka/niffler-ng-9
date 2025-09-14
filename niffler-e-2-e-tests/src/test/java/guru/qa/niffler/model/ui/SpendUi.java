@@ -18,7 +18,7 @@ public record SpendUi(
                 : spendJson.amount().toString();
 
         LocalDate date = LocalDate.parse(spendJson.spendDate().toString());
-        DateTimeFormatter out = DateTimeFormatter.ofPattern("MMM d, uuuu", Locale.ENGLISH);
+        DateTimeFormatter out = DateTimeFormatter.ofPattern("MMM dd, uuuu", Locale.ENGLISH);
         String formatted = date.format(out);
 
         return new SpendUi(

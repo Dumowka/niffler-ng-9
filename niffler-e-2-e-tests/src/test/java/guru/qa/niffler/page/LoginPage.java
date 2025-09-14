@@ -12,6 +12,9 @@ import static guru.qa.niffler.model.ErrorMessages.BAD_CREDENTIALS;
 
 @ParametersAreNonnullByDefault
 public class LoginPage extends BasePage<LoginPage> {
+
+  public static final String URL = CFG.authUrl() + "login";
+
   private final SelenideElement usernameInput = $("input[name='username']");
   private final SelenideElement passwordInput = $("input[name='password']");
   private final SelenideElement submitButton = $("button[type='submit']");

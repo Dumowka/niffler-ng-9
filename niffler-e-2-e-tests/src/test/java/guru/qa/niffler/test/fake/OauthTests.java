@@ -4,7 +4,6 @@ import guru.qa.niffler.api.AuthApiClient;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Token;
-import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.userdata.UserJson;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +15,7 @@ public class OauthTests {
     private final AuthApiClient authApiClient = new AuthApiClient();
 
     @Test
-    @User(friends = 1)
-    @ApiLogin
+    @ApiLogin(username = "duck", password = "12345")
     public void testOauth(@Token String token, UserJson user) {
         System.out.println(user);
         assertNotNull(token);

@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @ParametersAreNonnullByDefault
 public class UserProfilePage extends BasePage<UserProfilePage> {
 
+    public static final String URL = CFG.frontUrl() + "profile";
+
     private final SelenideElement photo = $("#image__input").parent().$("img");
     private final SelenideElement uploadNewPictureButton = $("label[for='image__input']");
     private final SelenideElement photoInput = $("input[type='file']");

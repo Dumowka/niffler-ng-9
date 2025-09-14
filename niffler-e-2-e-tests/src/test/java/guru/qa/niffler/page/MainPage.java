@@ -15,6 +15,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class MainPage extends BasePage<MainPage> {
 
+    public static final String URL = CFG.frontUrl() + "main";
 
     @Getter
     private final Header header = new Header();

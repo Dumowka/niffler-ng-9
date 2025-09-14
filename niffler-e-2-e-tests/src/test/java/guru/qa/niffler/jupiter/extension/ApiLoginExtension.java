@@ -3,10 +3,14 @@ package guru.qa.niffler.jupiter.extension;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 import guru.qa.niffler.api.AuthApiClient;
+import guru.qa.niffler.api.SpendApiClient;
+import guru.qa.niffler.api.UserdataApiClient;
 import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Token;
+import guru.qa.niffler.model.spend.CategoryJson;
+import guru.qa.niffler.model.spend.SpendJson;
 import guru.qa.niffler.model.userdata.TestData;
 import guru.qa.niffler.model.userdata.UserJson;
 import guru.qa.niffler.page.MainPage;
@@ -18,12 +22,20 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.openqa.selenium.Cookie;
 
+import java.util.List;
+
+import static guru.qa.niffler.model.userdata.FriendshipStatus.FRIEND;
+import static guru.qa.niffler.model.userdata.FriendshipStatus.INVITE_RECEIVED;
+import static guru.qa.niffler.model.userdata.FriendshipStatus.INVITE_SENT;
+
 public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver {
 
     private static final Config CFG = Config.getInstance();
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ApiLoginExtension.class);
 
     private final AuthApiClient authApiClient = new AuthApiClient();
+    private final SpendApiClient spendApiClient = new SpendApiClient();
+    private final UserdataApiClient userdataApiClient = new UserdataApiClient();
     private final boolean setupBrowser;
 
     private ApiLoginExtension(boolean setupBrowser) {
@@ -54,10 +66,22 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
                 }
                 userToLogin = userFromUserExtension;
             } else {
+
+                List<CategoryJson> categories = spendApiClient.allCategories(apiLogin.username(), false);
+                List<SpendJson> spends = spendApiClient.all(apiLogin.username(), null, null, null);
+                List<UserJson> outcomeInvitationsUsers = userdataApiClient.allUsers(apiLogin.username(), null)
+                        .stream().filter(user -> user.friendshipStatus() == INVITE_SENT).toList();
+                List<UserJson> friends = userdataApiClient.friends(apiLogin.username(), null);
+
                 UserJson fakeUser = new UserJson(
                         apiLogin.username(),
                         new TestData(
-                                apiLogin.password()
+                                apiLogin.password(),
+                                friends.stream().filter(user -> user.friendshipStatus() == FRIEND).toList(),
+                                friends.stream().filter(user -> user.friendshipStatus() == INVITE_RECEIVED).toList(),
+                                outcomeInvitationsUsers,
+                                categories,
+                                spends
                         )
                 );
                 if (userFromUserExtension != null) {
