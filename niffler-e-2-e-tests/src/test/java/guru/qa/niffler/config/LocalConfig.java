@@ -1,6 +1,8 @@
 package guru.qa.niffler.config;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.annotation.Nonnull;
 
 enum LocalConfig implements Config {
@@ -44,6 +46,12 @@ enum LocalConfig implements Config {
   @Override
   public @Nonnull String spendJdbcUrl() {
     return "jdbc:postgresql://127.0.0.1:5432/niffler-spend";
+  }
+
+  @NotNull
+  @Override
+  public String currencyGrpcAddress() {
+    return "127.0.0.1";
   }
 
   @Override

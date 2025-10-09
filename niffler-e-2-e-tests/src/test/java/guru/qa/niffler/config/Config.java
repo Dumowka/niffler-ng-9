@@ -27,6 +27,12 @@ public interface Config {
 
     @Nonnull String spendJdbcUrl();
 
+    @Nonnull String currencyGrpcAddress();
+
+    default int currencyGrpcPort() {
+        return 8092;
+    }
+
     @Nonnull String currencyJdbcUrl();
 
     @Nonnull String ghUrl();
